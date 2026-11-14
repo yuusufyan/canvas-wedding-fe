@@ -1,0 +1,13 @@
+import { computed } from 'vue'
+import { ROLES } from '@/constants/roles'
+import { useAuthStore } from '@/stores/auth'
+
+export function usePermission() {
+  const authStore = useAuthStore()
+
+  const isSuperAdmin = computed(() => authStore.profile?.role.name === ROLES.SUPERADMIN)
+  const canManageUsers = computed(() => isSuperAdmin.value)
+  const canManageRoles = computed(() => isSuperAdmin.value)
+
+  return { isSuperAdmin, canManageUsers, canManageRoles }
+}

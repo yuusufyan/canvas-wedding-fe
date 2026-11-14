@@ -1,0 +1,267 @@
+/*================================================================================
+	Item Name: Vuexy - Vuejs, HTML & Laravel Admin Dashboard Template
+	Version: 2.0
+	Author: PIXINVENT
+	Author URL: http://www.themeforest.net/user/pixinvent
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+/* ================================================================================
+   LAPISAN CRAFT — skill vuexy-html (One SMF)
+   --------------------------------------------------------------------------------
+   Satu-satunya CSS tambahan yang sah di atas Vuexy. Isinya hanya hal yang TIDAK bisa
+   diungkapkan dengan kelas Vuexy: font lokal & keseragaman font di pustaka pihak
+   ketiga, permukaan browser (fokus, seleksi, scrollbar),
+   angka tabular, pembungkusan judul, gerak yang menghormati reduced-motion, skip-link,
+   dan kontras teks tonal. Semua nilai diambil dari palet One SMF — tidak ada hex baru
+   di luar turunan shade warna semantik.
+
+   JANGAN menambah aturan per-halaman di sini. Kebutuhan halaman = susun kelas Vuexy.
+   Detail & alasan: references/18-craft-anti-slop.md dan CRAFT-CHANGELOG.md
+   ================================================================================ */
+
+
+/* ---------- 0. Font: satu keluarga di semua permukaan --------------------------
+   Montserrat dipasang LOKAL (app-assets/fonts/montserrat, lisensi OFL) supaya:
+   - halaman tetap Montserrat walau Google Fonts diblokir jaringan kantor/offline;
+   - mode inline build_page.py bisa menanam font (data URI) di satu file.
+   Bobot yang tersedia = yang dipakai Vuexy: 300, 400, 500, 600 (+ italic 400–600).
+   Tidak ada 700 — karena itu tidak boleh ada teks bold 700 (browser memalsukannya).
+   Fallback Vuexy asli "Helvetica, Arial, serif" jatuh ke SERIF — dibetulkan ke sans-serif. */
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 300; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-300-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 300; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-300-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-400-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 400; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-400-italic.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 400; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-400-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-500-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 500; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-500-italic.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 500; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-500-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-600-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-600-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 600; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-ext-600-italic.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; font-style: italic; font-weight: 600; font-display: swap;
+  src: url('../../app-assets/fonts/montserrat/montserrat-latin-600-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+
+:root {
+  --bs-font-sans-serif: 'Montserrat', Helvetica, Arial, sans-serif;
+  --bs-body-font-family: var(--bs-font-sans-serif);
+}
+html body,
+.tooltip, .popover, .dropdown-menu, .modal, .toast, .offcanvas,
+button, input, optgroup, select, textarea {
+  font-family: var(--bs-font-sans-serif);
+}
+/* Bobot maksimal 600 (tidak ada file 700). Bootstrap memberi b/strong "bolder". */
+b, strong, th, .fw-bold, .fw-bolder { font-synthesis: none; }
+b, strong, th, .table thead th, .table tfoot th { font-weight: 600; }
+
+/* Pustaka pihak ketiga yang membawa font sendiri. Semuanya dipaksa ke Montserrat,
+   ukuran tetap dari pustaka/Vuexy. !important diperlukan: ApexCharts menulis
+   atribut & style inline font-family "Helvetica, Arial, sans-serif". */
+.apexcharts-canvas, .apexcharts-canvas text, .apexcharts-canvas tspan,
+.apexcharts-text, .apexcharts-datalabel, .apexcharts-datalabel-label, .apexcharts-datalabel-value,
+.apexcharts-legend, .apexcharts-legend-text, .apexcharts-tooltip, .apexcharts-tooltip *,
+.apexcharts-xaxistooltip, .apexcharts-yaxistooltip, .apexcharts-menu, .apexcharts-title-text,
+.apexcharts-subtitle-text, .apexcharts-xaxis-label, .apexcharts-yaxis-label,
+.leaflet-container, .leaflet-popup-content, .leaflet-control,
+.swal2-popup, .swal2-title, .swal2-html-container, .swal2-styled,
+#toast-container, #toast-container > div,
+.flatpickr-calendar, .select2-container, .select2-results, .dataTables_wrapper,
+.ql-container, .ql-toolbar, .dropzone, .bs-stepper, .fc {
+  font-family: var(--bs-font-sans-serif) !important;
+}
+/* Label data & judul chart: Apex memakai bold 700 -> paksa ke 600 yang tersedia. */
+.apexcharts-datalabel, .apexcharts-datalabel-value, .apexcharts-title-text,
+.apexcharts-tooltip-title, .apexcharts-tooltip-text-y-value { font-weight: 600 !important; }
+.apexcharts-canvas text, .apexcharts-legend-text, .apexcharts-tooltip-text { font-variant-numeric: tabular-nums; }
+
+/* ---------- 1. Fokus keyboard -------------------------------------------------
+   bootstrap-extended.css menghapus ring fokus (.btn:focus{box-shadow:none}, juga
+   page-link, btn-close, accordion, list-group, link menu). :focus-visible hanya
+   muncul untuk keyboard, jadi tampilan saat diklik mouse tidak berubah sama sekali.
+   #16B1FF di atas putih 2.40 (perlu 3:1 untuk indikator) -> ring dua lapis:
+   garis primary + halo tipis, dengan offset putih agar terbaca di atas tombol solid. */
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.page-link:focus-visible,
+.btn-close:focus-visible,
+.accordion-button:focus-visible,
+.list-group-item-action:focus-visible,
+.nav-link:focus-visible,
+.dropdown-item:focus-visible,
+.main-menu .navigation li > a:focus-visible,
+.main-menu a:focus-visible,
+.navbar-brand:focus-visible,
+.breadcrumb a:focus-visible,
+.app-content a:focus-visible,
+.blank-page a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid #0E73A6 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px rgba(22, 177, 255, .22) !important;
+}
+.dark-layout .btn:focus-visible,
+.dark-layout .page-link:focus-visible,
+.dark-layout .nav-link:focus-visible,
+.dark-layout .dropdown-item:focus-visible,
+.dark-layout .app-content a:focus-visible,
+.main-menu a:focus-visible,
+.main-menu .navigation li > a:focus-visible {
+  outline-color: #16B1FF !important;            /* 6.11 di atas #1E293B */
+}
+
+/* Kontrol form: Vuexy menandai fokus dengan border #16B1FF (2.40:1 di putih — di bawah
+   3:1 untuk indikator, WCAG 1.4.11). Light mode: border fokus memakai shade #0E73A6 (5.22:1);
+   bentuk & bayangan Vuexy tetap. */
+/* :not(.is-invalid/.is-valid) wajib — tanpa itu border merah/hijau validasi tertimpa saat fokus. */
+html:not(.dark-layout) .form-control:focus:not(.is-invalid):not(.is-valid),
+html:not(.dark-layout) .form-select:focus:not(.is-invalid):not(.is-valid),
+html:not(.dark-layout) .input-group:not(.bootstrap-touchspin):not(.is-invalid):not(.is-valid):focus-within .form-control:not(.is-invalid):not(.is-valid),
+html:not(.dark-layout) .input-group:not(.bootstrap-touchspin):not(.is-invalid):not(.is-valid):focus-within .input-group-text { border-color: #0E73A6; }
+
+/* Label grup menu di sidebar gelap: rgba(241,245,249,.38) = 3.22:1 -> .6 = 5.77:1 */
+.semi-dark-layout .main-menu-content .navigation-main .navigation-header,
+.dark-layout .main-menu-content .navigation-main .navigation-header { color: rgba(241, 245, 249, .6); }
+
+/* ---------- 2. Angka tabular ---------------------------------------------------
+   Kolom nominal, tanggal, dan metrik harus sejajar digit per digit. Montserrat
+   punya fitur tnum; Vuexy tidak pernah menyalakannya. */
+.table td,
+.table th,
+.tabular-nums,
+.card-statistics h4,
+.statistics-body h4 {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 3. Pembungkusan teks ----------------------------------------------
+   Progresif: browser yang tidak mendukung tetap memakai wrap biasa. */
+h1, h2, h3, h4, h5, h6, .card-title, .content-header-title { text-wrap: balance; }
+p, .card-text, .alert-body, .form-text { text-wrap: pretty; }
+
+/* ---------- 4. Seleksi teks & scrollbar ---------------------------------------- */
+::selection { background: rgba(22, 177, 255, .24); color: #0F172A; }
+.dark-layout ::selection { background: rgba(22, 177, 255, .35); color: #F1F5F9; }
+
+.app-content, .table-responsive, .modal-body, .dropdown-menu, .offcanvas-body {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+.dark-layout .app-content, .dark-layout .table-responsive, .dark-layout .modal-body,
+.dark-layout .dropdown-menu, .dark-layout .offcanvas-body {
+  scrollbar-color: #475569 transparent;
+}
+
+/* ---------- 5. Skip-link --------------------------------------------------------
+   Markup: <a class="skip-link visually-hidden-focusable btn btn-primary" href="#konten-utama">
+   Tersembunyi sampai difokus dengan Tab. */
+.skip-link:focus,
+.skip-link:focus-within {
+  position: fixed !important;
+  top: .75rem;
+  left: .75rem;
+  z-index: 1100;
+}
+
+/* ---------- 6. Gerak yang menghormati reduced-motion ---------------------------
+   Bootstrap sudah mematikan transisi; Vuexy menambah transform sendiri
+   (pull-up, gradient naik 2px, card) yang tidak ikut dimatikan. Umpan balik warna
+   tetap ada — yang hilang hanya perpindahan posisi. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  .pull-up:hover,
+  [class*="btn-gradient-"]:hover,
+  [class*="bg-gradient-"]:hover,
+  .card { transform: none !important; }
+  .placeholder-glow .placeholder,
+  .placeholder-wave { animation-duration: 4s !important; }
+}
+
+/* ---------- 7. Kontras teks tonal (light mode) ---------------------------------
+   Teks tonal Vuexy memakai warna dasar di atas latar 12% warnanya sendiri:
+   primary 2.15:1, success 2.27, warning 1.96, info 2.17, danger 3.23 — gagal WCAG AA
+   (4.5:1). Di sini HANYA warna teks yang diganti dengan shade warna yang sama
+   (hue tetap), latar & border tidak disentuh, dark mode tidak disentuh.
+
+     primary   #16B1FF -> #0E73A6  (shade 35%)  4.70 di tonal, 5.22 di putih
+     secondary #64748B -> #5A687D  (shade 10%)  4.87 / 5.66
+     success   #10B981 -> #0A7854  (shade 35%)  4.91 / 5.49
+     danger    #EF4444 -> #BF3636  (shade 20%)  4.74 / 5.53
+     warning   #F59E0B -> #935F07  (shade 40%)  4.93 / 5.41
+     info      #06B6D4 -> #04768A  (shade 35%)  4.73 / 5.30
+     accent & dark sudah lolos (5.62 & 8.45) — tidak diubah.
+     text-muted #94A3B8 -> #5A687D            2.56 -> 5.66 di putih
+
+   Untuk kembali persis seperti aplikasi One SMF: hapus seluruh blok 7 ini. */
+html:not(.dark-layout) .badge.badge-light-primary,   html:not(.dark-layout) .bg-light-primary,   html:not(.dark-layout) .alert-primary,   html:not(.dark-layout) .app-content .text-primary,   html:not(.dark-layout) .blank-page .text-primary   { color: #0E73A6 !important; }
+html:not(.dark-layout) .badge.badge-light-secondary, html:not(.dark-layout) .bg-light-secondary, html:not(.dark-layout) .alert-secondary, html:not(.dark-layout) .app-content .text-secondary, html:not(.dark-layout) .blank-page .text-secondary { color: #5A687D !important; }
+html:not(.dark-layout) .badge.badge-light-success,   html:not(.dark-layout) .bg-light-success,   html:not(.dark-layout) .alert-success,   html:not(.dark-layout) .app-content .text-success   { color: #0A7854 !important; }
+html:not(.dark-layout) .badge.badge-light-danger,    html:not(.dark-layout) .bg-light-danger,    html:not(.dark-layout) .alert-danger,    html:not(.dark-layout) .app-content .text-danger    { color: #BF3636 !important; }
+html:not(.dark-layout) .badge.badge-light-warning,   html:not(.dark-layout) .bg-light-warning,   html:not(.dark-layout) .alert-warning,   html:not(.dark-layout) .app-content .text-warning   { color: #935F07 !important; }
+html:not(.dark-layout) .badge.badge-light-info,      html:not(.dark-layout) .bg-light-info,      html:not(.dark-layout) .alert-info,      html:not(.dark-layout) .app-content .text-info      { color: #04768A !important; }
+
+/* Teks meta (text-muted, form-text): Vuexy memakai Slate 400 #94A3B8 = 2.56:1 di putih.
+   Diganti #5A687D (shade token secondary): 5.66 di putih, 5.17 di header tabel #F1F5F9 —
+   tetap lebih redup dari teks body #334155, jadi hierarki terjaga.
+   Placeholder: #94A3B8 (2.56:1) -> #64748B (4.76:1) — lolos AA dan tetap jelas lebih terang
+   daripada nilai terisi #334155, jadi kosong vs terisi masih terbedakan. */
+html:not(.dark-layout) .app-content .text-muted,
+html:not(.dark-layout) .blank-page .text-muted,
+html:not(.dark-layout) .modal .text-muted,
+html:not(.dark-layout) .app-content .form-text,
+html:not(.dark-layout) .app-content caption,
+html:not(.dark-layout) .app-content .timeline-event-time { color: #5A687D !important; }
+html:not(.dark-layout) .form-control::placeholder { color: #64748B; opacity: 1; }
+
+/* Tombol outline & flat: teksnya teks. Border tetap warna brand. */
+html:not(.dark-layout) .app-content .btn-outline-primary:not(:hover):not(.active), html:not(.dark-layout) .app-content .btn-flat-primary,   html:not(.dark-layout) .modal .btn-outline-primary:not(:hover):not(.active), html:not(.dark-layout) .modal .btn-flat-primary   { color: #0E73A6; }
+html:not(.dark-layout) .app-content .btn-outline-secondary:not(:hover):not(.active), html:not(.dark-layout) .app-content .btn-flat-secondary, html:not(.dark-layout) .modal .btn-outline-secondary:not(:hover):not(.active), html:not(.dark-layout) .modal .btn-flat-secondary { color: #5A687D; }
+html:not(.dark-layout) .app-content .btn-outline-success:not(:hover):not(.active), html:not(.dark-layout) .app-content .btn-flat-success   { color: #0A7854; }
+html:not(.dark-layout) .app-content .btn-outline-danger:not(:hover):not(.active),  html:not(.dark-layout) .app-content .btn-flat-danger,    html:not(.dark-layout) .modal .btn-outline-danger:not(:hover):not(.active), html:not(.dark-layout) .modal .btn-flat-danger { color: #BF3636; }
+html:not(.dark-layout) .app-content .btn-outline-warning:not(:hover):not(.active), html:not(.dark-layout) .app-content .btn-flat-warning   { color: #935F07; }
+html:not(.dark-layout) .app-content .btn-outline-info:not(:hover):not(.active),    html:not(.dark-layout) .app-content .btn-flat-info      { color: #04768A; }
+
+/* Link teks di area konten (breadcrumb, link tabel, link di kartu). */
+html:not(.dark-layout) .app-content a:not(.btn):not(.dropdown-item):not(.nav-link):not(.page-link):not(.list-group-item),
+html:not(.dark-layout) .blank-page a:not(.btn),
+html:not(.dark-layout) .footer a { color: #0E73A6; }
+html:not(.dark-layout) .app-content a:not(.btn):not(.dropdown-item):not(.nav-link):not(.page-link):not(.list-group-item):hover,
+html:not(.dark-layout) .blank-page a:not(.btn):hover { color: #004D81;  /* = a:hover bawaan bootstrap.css */ text-decoration: underline; text-underline-offset: .2em; }
+/* link yang sengaja berwarna teks biasa (nama di tabel) */
+html:not(.dark-layout) .app-content a.text-body,
+html:not(.dark-layout) .app-content a.text-dark { color: inherit; }

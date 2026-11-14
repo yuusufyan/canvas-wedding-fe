@@ -1,0 +1,46 @@
+.semi-dark-layout .main-menu{background-color:#1e293b}.semi-dark-layout .main-menu .shadow-bottom{background:-webkit-linear-gradient(top,#1e293b 44%,rgba(30,41,59,.51) 73%,rgba(30,41,59,0));background:linear-gradient(180deg,#1e293b 44%,rgba(30,41,59,.51) 73%,rgba(30,41,59,0))}.semi-dark-layout .main-menu .navigation .sidebar-group-active>a{background-color:#2D3849!important}.semi-dark-layout .main-menu-content .navigation-main{background-color:#1e293b}.semi-dark-layout .main-menu-content .navigation-main .navigation-header{color:rgba(241,245,249,.38)}.semi-dark-layout .main-menu-content .navigation-main .nav-item.open:not(.sidebar-group-active)>a{background-color:#2D3849}.semi-dark-layout .main-menu-content .navigation-main .menu-content,.semi-dark-layout .main-menu-content .navigation-main .nav-item .menu-content,.semi-dark-layout .main-menu-content .navigation-main .nav-item .menu-content li:not(.active) a{background-color:#1e293b}.semi-dark-layout .main-menu-content .navigation-main .nav-item a,.semi-dark-layout .main-menu-content .navigation-main .nav-item a:after{color:rgba(241,245,249,.9)!important}.semi-dark-layout .main-menu-content .navigation-main .nav-item .menu-content .active .menu-item{color:#FFF}.semi-dark-layout .main-menu-content .navigation-main .active>a{color:#FFF!important}.semi-dark-layout .main-menu-content .navigation-main .active .menu-title,.semi-dark-layout .main-menu-content .navigation-main .active i{color:#FFF}.semi-dark-layout .main-menu-content .navigation-main .sidebar-group-active a{border-radius:6px}.semi-dark-layout .main-menu-content .navigation-main .menu-content .active{z-index:1}.semi-dark-layout .main-menu-content .navigation-main .menu-content .active a{background-color:transparent}.semi-dark-layout .menu-collapsed .main-menu:not(.expanded) .navigation-main li.active>a{background:#2D3849!important;color:#FFF!important}
+/* ===== Perbaikan kebocoran latar terang dari menu-light =====
+   components.css menetapkan latar #f5f5f5 untuk li.open / li.sidebar-group-active
+   (dirancang untuk sidebar PUTIH). Di semi-dark, aturan itu bocor setiap kali
+   override semi-dark tidak berlaku -- paling terlihat saat sidebar collapsed lalu
+   di-hover, karena .main-menu mendapat class .expanded. Hasilnya blok hampir putih
+   dengan teks abu yang tidak terbaca. Override berikut menutup semua state. */
+.semi-dark-layout .main-menu .navigation > li.open:not(.menu-item-closing) > a,
+.semi-dark-layout .main-menu .navigation > li.sidebar-group-active > a,
+.semi-dark-layout .main-menu.expanded .navigation > li.open:not(.menu-item-closing) > a,
+.semi-dark-layout .main-menu.expanded .navigation > li.sidebar-group-active > a {
+  background: #2D3849 !important;
+  color: rgba(241, 245, 249, .9) !important;
+  border-radius: 6px;
+}
+.semi-dark-layout .main-menu .navigation > li ul .open > a,
+.semi-dark-layout .main-menu .navigation > li ul .sidebar-group-active > a {
+  background: #2D3849 !important;
+  color: rgba(241, 245, 249, .9) !important;
+  border-radius: 6px;
+}
+/* Submenu & panel yang ikut terbuka saat expanded */
+.semi-dark-layout .main-menu.expanded .navigation-main,
+.semi-dark-layout .main-menu.expanded .navigation-main .menu-content,
+.semi-dark-layout .main-menu.expanded .navigation-main .nav-item .menu-content,
+.semi-dark-layout .main-menu.expanded .navigation-main .nav-item .menu-content li:not(.active) a {
+  background-color: #1E293B;
+}
+.semi-dark-layout .main-menu.expanded .navigation-main .nav-item a,
+.semi-dark-layout .main-menu.expanded .navigation-main .nav-item a:after {
+  color: rgba(241, 245, 249, .9) !important;
+}
+.semi-dark-layout .main-menu.expanded .navigation-main .navigation-header {
+  color: rgba(241, 245, 249, .38);
+}
+/* Item aktif tetap pill primary + teks putih di semua state */
+.semi-dark-layout .main-menu .navigation-main .active > a,
+.semi-dark-layout .main-menu.expanded .navigation-main .active > a {
+  color: #FFF !important;
+}
+/* Hover item menu: elevasi halus, bukan latar terang */
+.semi-dark-layout .main-menu .navigation > li > a:hover,
+.semi-dark-layout .main-menu .navigation > li ul li:not(.active) > a:hover {
+  background-color: #2D3849;
+  border-radius: 6px;
+}
