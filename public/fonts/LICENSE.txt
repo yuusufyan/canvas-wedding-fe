@@ -1,0 +1,2 @@
+Inter, Cormorant Garamond, Jost, dan Great Vibes dilisensikan di bawah SIL Open Font License 1.1
+(https://openfontlicense.org). Berkas woff2 di folder ini adalah subset Latin dari rilis Google Fonts.
