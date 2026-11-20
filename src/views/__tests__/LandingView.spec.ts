@@ -14,6 +14,7 @@ async function mountLanding() {
     routes: [
       { path: '/', name: 'landing', component: LandingView },
       { path: '/login', name: 'login', component: { template: '<div />' } },
+      { path: '/daftar', name: 'register', component: { template: '<div />' } },
       { path: '/dashboard', name: 'home', component: { template: '<div />' } },
       { path: '/demo/:slug', name: 'demo', component: { template: '<div />' } },
     ],
@@ -49,7 +50,7 @@ describe('LandingView', () => {
     wrapper.unmount()
   })
 
-  it('TC-UI-F2-02: Mulai gratis dan Buat undangan gratis mengarah ke login, Lihat demo ke demo', async () => {
+  it('TC-UI-F2-02: Mulai gratis dan Buat undangan gratis mengarah ke daftar, Lihat demo ke demo', async () => {
     const wrapper = await mountLanding()
     await flushPromises()
 
@@ -59,8 +60,8 @@ describe('LandingView', () => {
         .filter((a) => a.text().includes(label))
         .map((a) => a.attributes('href'))
 
-    expect(hrefOf('Mulai gratis').every((h) => h === '/login')).toBe(true)
-    expect(hrefOf('Buat undangan gratis').every((h) => h === '/login')).toBe(true)
+    expect(hrefOf('Mulai gratis').every((h) => h === '/daftar')).toBe(true)
+    expect(hrefOf('Buat undangan gratis').every((h) => h === '/daftar')).toBe(true)
     expect(hrefOf('Lihat demo')).toEqual(['/demo/rustic-hijau'])
     wrapper.unmount()
   })

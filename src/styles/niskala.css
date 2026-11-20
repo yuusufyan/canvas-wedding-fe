@@ -2788,3 +2788,392 @@ body.nk-modal-open {
     transition: none !important;
   }
 }
+
+/* ====================================================================================
+   Halaman auth: Masuk, Daftar, Cek Email, Aktivasi.
+   >= 992: panel brand 640 px + form; di bawahnya hanya form (maks 420 px) dengan logo di atas.
+   ==================================================================================== */
+.nk-auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--nk-font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--nk-ink);
+  background: var(--nk-bg);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+.nk-auth * {
+  box-sizing: border-box;
+}
+.nk-auth a {
+  color: inherit;
+  text-decoration: none;
+}
+.nk-auth button,
+.nk-auth input {
+  font-family: inherit;
+}
+:where(.nk-auth) :is(h1, h2, p) {
+  margin: 0;
+  padding: 0;
+}
+:where(.nk-auth) :is(h1, h2) {
+  font-family: var(--nk-font-display);
+  font-weight: 600;
+  color: inherit;
+  line-height: 1.1;
+}
+.nk-auth a:focus-visible,
+.nk-auth button:focus-visible,
+.nk-auth input:focus-visible {
+  outline: 2px solid var(--nk-brand) !important;
+  outline-offset: 3px !important;
+  box-shadow: none !important;
+}
+.nk-auth__brand a:focus-visible {
+  outline-color: var(--nk-gold) !important;
+}
+.nk-auth .nk-btn {
+  min-height: 54px;
+}
+
+.nk-auth__brand {
+  display: none;
+}
+.nk-auth__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 28px clamp(20px, 6vw, 56px) 48px;
+}
+.nk-auth__main:focus {
+  outline: none;
+}
+.nk-auth__logo {
+  align-self: flex-start;
+  width: 120px;
+}
+.nk-auth__card {
+  width: 100%;
+  max-width: 420px;
+}
+@media (min-width: 992px) {
+  .nk-auth {
+    grid-template-columns: 640px minmax(0, 1fr);
+  }
+  .nk-auth__brand {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 56px;
+    overflow: hidden;
+    background: var(--nk-brand-dark);
+    color: var(--nk-champagne);
+  }
+  .nk-auth__brandlogo {
+    width: 150px;
+  }
+  .nk-auth__pitch {
+    max-width: 330px;
+    margin-bottom: 18vh;
+  }
+  .nk-auth__headline {
+    font-family: var(--nk-font-display);
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .nk-auth__sub {
+    margin-top: 16px;
+    font-size: 15px;
+    color: rgba(244, 237, 224, 0.85);
+  }
+  .nk-auth__phone {
+    position: absolute;
+    right: 20px;
+    bottom: 40px;
+    width: 232px;
+  }
+  .nk-auth__main {
+    justify-content: center;
+    padding-block: 48px;
+  }
+  .nk-auth__logo {
+    display: none;
+  }
+}
+
+.nk-auth__title {
+  font-size: clamp(34px, 4vw, 42px);
+}
+.nk-auth__title:focus {
+  outline: none !important;
+}
+.nk-auth__lead {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--nk-muted);
+}
+.nk-auth__center {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.nk-auth__center .nk-auth__lead {
+  margin-top: 0;
+}
+.nk-auth__center .nk-btn {
+  margin-top: 8px;
+}
+.nk-auth__email {
+  font-size: 17px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.nk-auth__icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+}
+.nk-auth__icon--brand {
+  background: var(--nk-brand-soft);
+  color: var(--nk-brand);
+}
+.nk-auth__icon--warning {
+  background: #fff1d6;
+  color: #8a5a00;
+}
+.nk-auth__icon--success {
+  background: #e3f3e8;
+  color: #1f6b3f;
+}
+.nk-auth__switch {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--nk-muted);
+}
+.nk-auth__switch a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+  font-weight: 600;
+  color: var(--nk-brand);
+}
+.nk-auth__box {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 16px;
+  border: 1px solid var(--nk-border-warm);
+  border-radius: 16px;
+  background: var(--nk-surface);
+  text-align: center;
+}
+.nk-auth__boxtitle {
+  font-family: var(--nk-font-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+.nk-auth__hint {
+  font-size: 12px;
+  color: var(--nk-muted);
+  text-align: center;
+}
+
+.nk-authform {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+.nk-authfield__label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.nk-authfield__control {
+  position: relative;
+}
+.nk-authfield__input {
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  border: 1.5px solid var(--nk-border-warm);
+  border-radius: 14px;
+  background: var(--nk-surface);
+  color: var(--nk-ink);
+  font-size: 15px;
+}
+.nk-authfield__input::placeholder {
+  color: #a39a8c;
+}
+.nk-authfield__input:focus {
+  border-color: var(--nk-brand);
+}
+.nk-authfield__input.has-toggle {
+  padding-right: 56px;
+}
+.nk-authfield__input.is-invalid {
+  border-color: var(--nk-danger);
+  background: #fffaf9;
+}
+.nk-authfield__input:disabled {
+  opacity: 0.6;
+}
+.nk-authfield__toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--nk-muted);
+  cursor: pointer;
+}
+.nk-authfield__toggle:hover {
+  color: var(--nk-brand);
+}
+.nk-authfield__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--nk-danger);
+}
+
+.nk-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+.nk-alert .nk-icon {
+  flex: none;
+  margin-top: 2px;
+}
+.nk-alert__body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.nk-alert--danger {
+  background: #fdecea;
+  color: #c5221f;
+}
+.nk-alert--warning {
+  background: #fff1d6;
+  color: #8a5a00;
+}
+.nk-alert--info {
+  background: #e4eeff;
+  color: #1f4fbf;
+}
+.nk-alert--success {
+  background: #e3f3e8;
+  color: #1f6b3f;
+}
+.nk-alert__action {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.nk-alert__action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.nk-alert__note {
+  font-size: 13px;
+}
+
+.nk-strength {
+  margin-top: 10px;
+}
+.nk-strength__bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.nk-strength__bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--nk-border-warm);
+}
+.nk-strength__bar.is-weak {
+  background: #d98c00;
+}
+.nk-strength__bar.is-strong {
+  background: #1f6b3f;
+}
+.nk-strength__text {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--nk-muted);
+}
+
+.nk-progress {
+  width: min(260px, 100%);
+  height: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--nk-border-warm);
+}
+.nk-progress span {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--nk-brand);
+  animation: nk-progress 1.4s ease-in-out infinite;
+}
+@keyframes nk-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+.nk-spin {
+  animation: nk-rotate 1s linear infinite;
+}
+@keyframes nk-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nk-auth *,
+  .nk-spin,
+  .nk-progress span {
+    animation: none !important;
+    transition: none !important;
+  }
+}

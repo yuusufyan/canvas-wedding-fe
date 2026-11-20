@@ -19,7 +19,7 @@ import { DEMO_SLUG_DEFAULT, HERO_PREVIEW_PAGE } from '@/constants/landing'
           satu link. Tanpa desainer, tanpa ribet, selesai dalam hitungan menit.
         </p>
         <div class="nk-hero__cta">
-          <RouterLink class="nk-btn nk-btn--primary" :to="{ name: 'login' }">
+          <RouterLink class="nk-btn nk-btn--primary" :to="{ name: 'register' }">
             Buat undangan gratis
             <NkIcon name="arrow-right" :size="18" />
           </RouterLink>

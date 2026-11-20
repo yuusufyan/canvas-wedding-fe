@@ -68,7 +68,7 @@ onMounted(() => {
                 <RouterLink class="nk-nav__login nk-only-wide" :to="{ name: 'login' }">
                   Masuk
                 </RouterLink>
-                <RouterLink class="nk-btn nk-btn--primary nk-btn--sm" :to="{ name: 'login' }">
+                <RouterLink class="nk-btn nk-btn--primary nk-btn--sm" :to="{ name: 'register' }">
                   Mulai gratis
                 </RouterLink>
               </template>

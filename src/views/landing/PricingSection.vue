@@ -29,7 +29,7 @@ const { free, premium } = LANDING_PLANS
               <NkIcon name="check" :size="18" />{{ item }}
             </li>
           </ul>
-          <RouterLink class="nk-btn nk-btn--outline" :to="{ name: 'login' }">
+          <RouterLink class="nk-btn nk-btn--outline" :to="{ name: 'register' }">
             Mulai gratis
           </RouterLink>
         </article>
@@ -50,7 +50,9 @@ const { free, premium } = LANDING_PLANS
               <NkIcon name="check" :size="18" />{{ item }}
             </li>
           </ul>
-          <RouterLink class="nk-btn nk-btn--gold" :to="{ name: 'login' }">Coba Premium</RouterLink>
+          <RouterLink class="nk-btn nk-btn--gold" :to="{ name: 'register' }"
+            >Coba Premium</RouterLink
+          >
         </article>
       </div>
     </div>

@@ -17,8 +17,10 @@ export const authGuard: NavigationGuardWithThis<undefined> = async (to) => {
   const authStore = useAuthStore()
   await authStore.bootstrap()
 
-  if (to.name === 'login' && authStore.isAuthenticated) {
-    return { name: 'home' }
+  // Pengguna yang sudah masuk tidak perlu melihat Masuk/Daftar: SuperAdmin ke halaman admin
+  // yang ada, role lain ke area pelanggan.
+  if ((to.name === 'login' || to.name === 'register') && authStore.isAuthenticated) {
+    return authStore.isSuperAdmin ? { name: 'home' } : '/app'
   }
 
   if (!to.meta.public && !authStore.isAuthenticated) {

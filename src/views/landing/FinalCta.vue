@@ -8,7 +8,7 @@ import NkIcon from '@/components/NkIcon.vue'
     <div class="nk-container">
       <h2 id="cta-title">Hari bahagia kalian pantas punya undangan yang personal.</h2>
       <p>Bikin undangan pertamamu gratis hari ini. Tanpa kartu kredit.</p>
-      <RouterLink class="nk-btn nk-btn--gold" :to="{ name: 'login' }">
+      <RouterLink class="nk-btn nk-btn--gold" :to="{ name: 'register' }">
         Buat undangan gratis
         <NkIcon name="arrow-right" :size="18" />
       </RouterLink>

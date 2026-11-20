@@ -4,7 +4,8 @@ import { authGuard } from './guard'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, savedPosition) {
-    if (to.hash) {
+    // Hanya landing yang punya anchor; hash lain (mis. token aktivasi) tidak boleh dijadikan selector.
+    if (to.hash && to.name === 'landing') {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       return { el: to.hash, top: 8, behavior: reduced ? 'auto' : 'smooth' }
     }
@@ -77,6 +78,24 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
+      meta: { public: true },
+    },
+    {
+      path: '/daftar',
+      name: 'register',
+      component: () => import('../views/RegisterView.vue'),
+      meta: { public: true },
+    },
+    {
+      path: '/cek-email',
+      name: 'check-email',
+      component: () => import('../views/CheckEmailView.vue'),
+      meta: { public: true },
+    },
+    {
+      path: '/aktivasi',
+      name: 'activate',
+      component: () => import('../views/ActivateView.vue'),
       meta: { public: true },
     },
     {

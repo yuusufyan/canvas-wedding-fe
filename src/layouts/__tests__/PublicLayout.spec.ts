@@ -11,6 +11,7 @@ function mountLayout() {
     routes: [
       { path: '/', name: 'landing', component: { template: '<div />' } },
       { path: '/login', name: 'login', component: { template: '<div />' } },
+      { path: '/daftar', name: 'register', component: { template: '<div />' } },
       { path: '/dashboard', name: 'home', component: { template: '<div />' } },
     ],
   })
@@ -54,11 +55,11 @@ describe('PublicLayout', () => {
     wrapper.unmount()
   })
 
-  it('TC-UI-F2-56: tamu melihat Masuk dan Mulai gratis ke login, pengguna login melihat Dasbor', () => {
+  it('TC-UI-F2-56: tamu melihat Masuk ke login dan Mulai gratis ke daftar, pengguna login melihat Dasbor', () => {
     const guest = mountLayout()
     const links = guest.findAll('.nk-nav__actions a')
     expect(links.map((a) => a.text())).toEqual(['Masuk', 'Mulai gratis'])
-    expect(links.every((a) => a.attributes('href') === '/login')).toBe(true)
+    expect(links.map((a) => a.attributes('href'))).toEqual(['/login', '/daftar'])
     guest.unmount()
 
     useAuthStore().$patch({ isAuthenticated: true })
