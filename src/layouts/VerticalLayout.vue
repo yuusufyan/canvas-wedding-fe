@@ -179,12 +179,12 @@ onBeforeUnmount(() => {
             id="dropdown-user"
             ref="dropdownToggle"
             type="button"
-            class="nav-link dropdown-toggle dropdown-user-link btn btn-link"
+            class="nav-link dropdown-toggle dropdown-user-link btn btn-link d-flex align-items-center"
             aria-haspopup="true"
             :aria-expanded="dropdownOpen"
             @click="toggleDropdown"
           >
-            <div class="user-nav d-sm-flex d-none">
+            <div class="user-nav d-sm-flex d-none flex-column align-items-end me-75">
               <span class="user-name fw-bolder">{{ authStore.profile?.name }}</span>
               <span class="user-status">{{ authStore.profile?.role.name }}</span>
             </div>
@@ -225,7 +225,7 @@ onBeforeUnmount(() => {
             <span class="brand-logo"
               ><img src="/vuexy/app-assets/images/logo/logo.svg" alt="" height="24"
             /></span>
-            <h2 class="brand-text">Canvas Wedding</h2>
+            <h2 class="brand-text text-nowrap">Canvas Wedding</h2>
           </RouterLink>
         </li>
         <li class="nav-item nav-toggle">
@@ -275,7 +275,6 @@ onBeforeUnmount(() => {
     ></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper container-xxl p-0">
-      <div class="content-header row"></div>
       <div class="content-body">
         <slot />
       </div>

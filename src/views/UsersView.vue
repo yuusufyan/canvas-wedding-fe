@@ -230,7 +230,7 @@ onMounted(() => {
       <div class="content-header-left col-12 mb-2">
         <div class="row breadcrumbs-top">
           <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="content-header-title float-start mb-0">Manajemen Pengguna</h2>
+            <h2 class="content-header-title border-0 pe-0 mb-0">Manajemen Pengguna</h2>
             <button
               v-if="canCreate"
               type="button"
@@ -295,26 +295,34 @@ onMounted(() => {
                 </span>
               </td>
               <td>{{ formatDate(user.created_at) }}</td>
-              <td v-if="showActionColumn" class="text-end">
+              <td v-if="showActionColumn" class="text-end text-nowrap">
                 <button
                   v-if="canUpdate"
                   type="button"
-                  class="btn btn-sm btn-outline-primary me-50"
+                  class="btn btn-icon btn-sm btn-flat-primary"
+                  title="Ubah"
+                  aria-label="Ubah"
                   :data-testid="`btn-edit-${user.id}`"
                   @click="openModal('edit', user)"
                 >
-                  <FeatherIcon name="edit-2" class="me-25" />Ubah
+                  <FeatherIcon name="edit-2" />
                 </button>
                 <button
                   v-if="canDelete"
                   type="button"
-                  class="btn btn-sm btn-outline-danger"
+                  class="btn btn-icon btn-sm btn-flat-danger"
+                  title="Hapus"
+                  aria-label="Hapus"
                   :data-testid="`btn-delete-${user.id}`"
                   :disabled="isSelf(user) || deletingId === user.id"
                   @click="handleDelete(user)"
                 >
-                  <FeatherIcon name="trash-2" class="me-25" />
-                  {{ deletingId === user.id ? 'Menghapus…' : 'Hapus' }}
+                  <span
+                    v-if="deletingId === user.id"
+                    class="spinner-border spinner-border-sm"
+                    aria-hidden="true"
+                  ></span>
+                  <FeatherIcon v-else name="trash-2" />
                 </button>
               </td>
             </tr>

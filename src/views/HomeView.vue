@@ -10,11 +10,13 @@ const { canManageUsers, canManageRoles } = usePermission()
 
 <template>
   <VerticalLayout>
-    <div class="row match-height">
+    <div class="row">
       <div class="col-12 mb-2">
         <div class="card card-congratulations">
-          <div class="card-body text-center p-3">
-            <h1 class="card-title fw-bold text-white mb-1">Halo, {{ authStore.profile?.name }}!</h1>
+          <div class="card-body p-2">
+            <h1 class="h3 card-title fw-bold text-white mb-50">
+              Halo, {{ authStore.profile?.name }}!
+            </h1>
             <p class="card-text text-white mb-0">
               Selamat datang di Panel Manajemen Canvas Wedding. Anda masuk sebagai
               <strong>{{ authStore.profile?.role.name }}</strong
@@ -24,8 +26,8 @@ const { canManageUsers, canManageRoles } = usePermission()
         </div>
       </div>
 
-      <div v-if="canManageUsers" class="col-md-6 col-12">
-        <div class="card">
+      <div v-if="canManageUsers" class="col-md-6 col-12 mb-2">
+        <div class="card h-100 mb-0">
           <div class="card-body d-flex align-items-center justify-content-between">
             <div>
               <h4 class="card-title fw-bold mb-50">Manajemen Pengguna</h4>
@@ -43,8 +45,8 @@ const { canManageUsers, canManageRoles } = usePermission()
         </div>
       </div>
 
-      <div v-if="canManageRoles" class="col-md-6 col-12">
-        <div class="card">
+      <div v-if="canManageRoles" class="col-md-6 col-12 mb-2">
+        <div class="card h-100 mb-0">
           <div class="card-body d-flex align-items-center justify-content-between">
             <div>
               <h4 class="card-title fw-bold mb-50">Manajemen Role</h4>

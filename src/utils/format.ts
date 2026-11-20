@@ -7,7 +7,6 @@ const idrFormatter = new Intl.NumberFormat('id-ID', {
 
 const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   dateStyle: 'medium',
-  timeStyle: 'short',
 })
 
 /** Formats a backend decimal string (e.g. "25000.00") as IDR currency for display only. */
@@ -19,7 +18,7 @@ export function formatCurrency(value: string | number): string {
   return idrFormatter.format(num)
 }
 
-/** Formats an ISO timestamp into Indonesian locale date-time. */
+/** Formats an ISO timestamp into an Indonesian locale date (no time). */
 export function formatDate(value: string): string {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) {
