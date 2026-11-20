@@ -105,10 +105,10 @@ test('TC-UI-F2-14: navigasi anchor dan FAQ accordion bisa dipakai keyboard', asy
   )
 })
 
-test('TC-UI-F2-15: Mulai gratis mengarah ke login sementara', async ({ page }) => {
+test('TC-UI-F2-15: Mulai gratis mengarah ke halaman Daftar', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('banner').getByRole('link', { name: 'Mulai gratis' }).click()
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(/\/daftar$/)
 })
 
 test('TC-UI-F2-16: demo bisa dijeda, pindah bagian, dan ditutup kembali ke landing', async ({
