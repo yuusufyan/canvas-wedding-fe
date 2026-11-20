@@ -1,10 +1,22 @@
 import type { ApiEnvelope, PaginationMeta } from '@/types/api'
 
-// Mode uji manual/E2E: window.__nkMock = 'empty' | 'error' | 'slow' | 'forbidden'
-// (hanya ada saat dev + mock).
+// Mode uji manual/E2E (hanya ada saat dev + mock), diisi lewat window.__nkMock:
+// - empty, error, slow, forbidden: data admin dan publik
+// - rate-limit: login, register, verify-email, resend-verification menjawab 429
+// - unverified: login dengan kredensial benar menjawab 403 (email belum diverifikasi)
+// - token-expired: verify-email menjawab 400 untuk token apa pun
+// - network: semua permintaan API gagal seperti jaringan terputus
 declare global {
   interface Window {
-    __nkMock?: 'empty' | 'error' | 'slow' | 'forbidden'
+    __nkMock?:
+      | 'empty'
+      | 'error'
+      | 'slow'
+      | 'forbidden'
+      | 'rate-limit'
+      | 'unverified'
+      | 'token-expired'
+      | 'network'
   }
 }
 

@@ -55,6 +55,9 @@ export function installMockApi(): void {
       body: await parseBody(init),
     }
     if (request.url.pathname.startsWith(API_BASE_PATH)) {
+      if (window.__nkMock === 'network') {
+        throw new TypeError('Failed to fetch')
+      }
       for (const handler of HANDLERS) {
         const response = await handler(request)
         if (response) {

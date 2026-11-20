@@ -4,6 +4,22 @@ export interface LoginRequest {
   password: string
 }
 
+// Body untuk POST /auth/register (TODO(BE): kontrak auth-register-rbac, EP-01; respons 202 identik).
+export interface RegisterRequest {
+  name: string
+  email: string
+  password: string
+}
+
+// Body untuk POST /auth/verify-email (EP-09) dan POST /auth/resend-verification (EP-10).
+export interface VerifyEmailRequest {
+  token: string
+}
+
+export interface ResendVerificationRequest {
+  email: string
+}
+
 // `data` shape shared by POST /auth/login and POST /auth/refresh.
 export interface TokenResponse {
   access_token: string
