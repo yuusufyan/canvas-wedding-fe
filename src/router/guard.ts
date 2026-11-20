@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    /** Routes reachable without a session: login and the 404 catch-all. */
+    /** Routes reachable without a session: landing, demo, login, and the 404 catch-all. */
     public?: boolean
     /** Requires SuperAdmin role to access. */
     requireSuperAdmin?: boolean
