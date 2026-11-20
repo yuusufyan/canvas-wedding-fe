@@ -106,5 +106,7 @@ export default defineConfig({
     command: process.env.CI ? 'npm run preview' : 'npm run dev',
     port: process.env.CI ? 4173 : 5173,
     reuseExistingServer: !process.env.CI,
+    // Landing dan demo dilayani data contoh (src/api/mock) sampai endpoint publik backend ada.
+    env: { VITE_USE_MOCK_API: 'true' },
   },
 })

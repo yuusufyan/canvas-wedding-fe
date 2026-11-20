@@ -4,7 +4,15 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { setSessionExpiredCallback } from './api/http'
+import { loadMockApi } from './config'
+import './styles/niskala.css'
 import { useAuthStore } from './stores/auth'
+
+// Data contoh untuk endpoint yang belum ada di backend; hanya dev dan tidak masuk bundle produksi.
+if (loadMockApi) {
+  const { installMockApi } = await loadMockApi()
+  installMockApi()
+}
 
 const app = createApp(App)
 
