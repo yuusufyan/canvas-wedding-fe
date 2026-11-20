@@ -140,3 +140,50 @@ describe('data exposure', () => {
     expect(typeof localStorage === 'undefined' ? 0 : localStorage.length).toBe(0)
   })
 })
+
+describe('useAuthStore() menus dan permissions', () => {
+  async function bootstrapWith(me: MeResponse) {
+    setSession(tokens)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<FetchMock>(async (url) =>
+        url === '/api/v1/auth/refresh' ? jsonResponse(200, tokens) : jsonResponse(200, me),
+      ),
+    )
+    const store = useAuthStore()
+    await store.bootstrap()
+    return store
+  }
+
+  it('TC-UI-F3-73: menyimpan menus dan permissions dari /auth/me dan mengosongkannya saat logout', async () => {
+    const menus = [
+      {
+        key: 'admin.templates',
+        label: 'Template',
+        path: '/admin/template',
+        icon: 'layout',
+        parent_key: null,
+        sort_order: 20,
+      },
+    ]
+    const store = await bootstrapWith({ ...profile, menus, permissions: ['templates.read'] })
+
+    expect(store.menus).toEqual(menus)
+    expect(store.permissions).toEqual(['templates.read'])
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<FetchMock>(async () => jsonResponse(204, null)),
+    )
+    await store.logout()
+    expect(store.menus).toEqual([])
+    expect(store.permissions).toEqual([])
+  })
+
+  it('TC-UI-F3-74: backend lama tanpa menus/permissions menghasilkan daftar kosong', async () => {
+    const store = await bootstrapWith(profile)
+
+    expect(store.menus).toEqual([])
+    expect(store.permissions).toEqual([])
+  })
+})

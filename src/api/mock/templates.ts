@@ -66,6 +66,50 @@ const THEMES: Theme[] = [
     panel: '#FFFDF8',
     panelInk: '#2E2A25',
   },
+  {
+    slug: 'minimalis-modern',
+    name: 'Minimalis Modern',
+    access: 'Gratis',
+    background: '#FFFFFF',
+    ink: '#2E2A25',
+    accent: '#2E2A25',
+    nameFont: 'serif',
+    panel: '#F4EDE0',
+    panelInk: '#2E2A25',
+  },
+  {
+    slug: 'midnight-gold',
+    name: 'Midnight Gold',
+    access: 'Premium',
+    background: '#1B1E33',
+    ink: '#E9D8B4',
+    accent: '#E9D8B4',
+    nameFont: 'serif',
+    panel: '#F4EDE0',
+    panelInk: '#2E2A25',
+  },
+  {
+    slug: 'batik-klasik',
+    name: 'Batik Klasik',
+    access: 'Premium',
+    background: '#6B4A2B',
+    ink: '#F4EDE0',
+    accent: '#E9D8B4',
+    nameFont: 'serif',
+    panel: '#F4EDE0',
+    panelInk: '#2E2A25',
+  },
+  {
+    slug: 'ocean-dusk',
+    name: 'Ocean Dusk',
+    access: 'Gratis',
+    background: '#DCE6EE',
+    ink: '#3F5568',
+    accent: '#3F5568',
+    nameFont: 'serif',
+    panel: '#FFFDF8',
+    panelInk: '#2E2A25',
+  },
 ]
 
 function text(
@@ -253,8 +297,21 @@ function demoPages(theme: Theme): InvitationPage[] {
   ]
 }
 
+export const MOCK_THEME_SLUGS = THEMES.map((theme) => theme.slug)
+
+// Cover tanpa tombol untuk thumbnail; tema dipilih lewat slug (default: tema pertama).
+export function mockCover(slug: string): InvitationPage {
+  const theme = THEMES.find((item) => item.slug === slug) ?? THEMES[0]!
+  return coverPage(theme, false)
+}
+
+export function mockThemeInfo(slug: string): { name: string; access: TemplateAccess } | null {
+  const theme = THEMES.find((item) => item.slug === slug)
+  return theme ? { name: theme.name, access: theme.access } : null
+}
+
 export function mockTemplateSummaries(limit: number): PublicTemplateSummary[] {
-  return THEMES.slice(0, limit).map((theme) => ({
+  return THEMES.slice(0, Math.min(limit, 4)).map((theme) => ({
     slug: theme.slug,
     name: theme.name,
     access: theme.access,
