@@ -40,4 +40,30 @@ describe('router', () => {
     expect(scroll('/', '/demo/x', { left: 0, top: 120 })).toEqual({ left: 0, top: 120 })
     expect(scroll('/', '/', null)).toBe(false)
   })
+
+  it('TC-UI-F3-71: rute admin hanya SuperAdmin; menu tanpa halaman memakai halaman segera hadir', () => {
+    for (const path of [
+      '/admin/template',
+      '/admin/membership',
+      '/admin/undangan',
+      '/admin/tamu',
+      '/admin/pengaturan',
+    ]) {
+      expect(router.resolve(path).meta.requireSuperAdmin).toBe(true)
+    }
+    expect(router.resolve('/admin/template').name).toBe('admin-templates')
+    expect(router.resolve('/admin/membership').name).toBe('admin-membership')
+    expect(router.resolve('/admin/template/abc/editor').name).toBe('admin-template-editor')
+    expect(router.resolve('/admin/tamu').name).toBe('admin-coming-soon')
+    expect(router.resolve('/app').name).toBe('app-coming-soon')
+    expect(router.resolve('/app/budget').name).toBe('app-coming-soon')
+  })
+
+  it('TC-UI-F3-72: /admin dan /admin/pengguna dialihkan ke halaman lama', () => {
+    expect(router.resolve('/admin').redirectedFrom).toBeUndefined()
+    const admin = router.getRoutes().find((r) => r.path === '/admin')!
+    const users = router.getRoutes().find((r) => r.path === '/admin/pengguna')!
+    expect(admin.redirect).toEqual({ name: 'home' })
+    expect(users.redirect).toEqual({ name: 'users' })
+  })
 })

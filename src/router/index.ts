@@ -28,6 +28,39 @@ const router = createRouter({
       name: 'home',
       component: () => import('../views/HomeView.vue'),
     },
+    // Rute admin: path mengikuti katalog menu backend (auth-register-rbac). Menu tanpa halaman
+    // memakai ComingSoonView; Pengguna & Role tetap di halaman lama (/users, /roles).
+    { path: '/admin', redirect: { name: 'home' } },
+    {
+      path: '/admin/template',
+      name: 'admin-templates',
+      component: () => import('../views/AdminTemplatesView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    {
+      path: '/admin/template/:id/editor',
+      name: 'admin-template-editor',
+      component: () => import('../views/ComingSoonView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    {
+      path: '/admin/membership',
+      name: 'admin-membership',
+      component: () => import('../views/AdminMembershipView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    { path: '/admin/pengguna', redirect: { name: 'users' } },
+    {
+      path: '/admin/:section(undangan|tamu|pengaturan)',
+      name: 'admin-coming-soon',
+      component: () => import('../views/ComingSoonView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    {
+      path: '/app/:rest(.+)?',
+      name: 'app-coming-soon',
+      component: () => import('../views/ComingSoonView.vue'),
+    },
     {
       path: '/users',
       name: 'users',

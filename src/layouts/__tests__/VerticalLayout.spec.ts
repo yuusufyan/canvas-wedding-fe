@@ -73,6 +73,22 @@ describe('VerticalLayout', () => {
     expect(navText).toContain('Role')
   })
 
+  it('TC-UI-F3-75: SuperAdmin juga melihat tautan ke halaman Template dan Membership di shell baru', async () => {
+    fillProfile('Super Administrator', { id: 'role-superadmin', name: 'SuperAdmin' })
+    const wrapper = await mountLayout(createTestRouter())
+
+    const hrefs = wrapper.findAll('.navigation-main a').map((a) => a.attributes('href'))
+    expect(hrefs).toContain('/admin/template')
+    expect(hrefs).toContain('/admin/membership')
+
+    setActivePinia(createPinia())
+    fillProfile('Regular Staff', { id: 'role-staff', name: 'Staff' })
+    const staff = await mountLayout(createTestRouter())
+    expect(staff.findAll('.navigation-main a').map((a) => a.attributes('href'))).not.toContain(
+      '/admin/template',
+    )
+  })
+
   it('TC-UNIT-39: renders a malicious name/role name as literal text, never as markup', async () => {
     const payload = '<img src=x onerror=alert(1)>'
     fillProfile(payload, { id: 'role-x', name: payload })

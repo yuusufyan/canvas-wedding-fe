@@ -26,8 +26,10 @@ const avatarInitial = computed(() => authStore.profile?.name.charAt(0).toUpperCa
 interface MenuItem {
   name: string
   label: string
-  icon: 'home' | 'users' | 'shield'
+  icon: 'home' | 'users' | 'shield' | 'layout' | 'credit-card'
   activeRoutes: string[]
+  /** Path langsung untuk halaman di shell baru (bukan route yang dikenal layout ini). */
+  path?: string
 }
 
 const menuItems = computed<MenuItem[]>(() => {
@@ -39,6 +41,25 @@ const menuItems = computed<MenuItem[]>(() => {
   }
   if (canManageRoles.value) {
     items.push({ name: 'roles', label: 'Role', icon: 'shield', activeRoutes: ['roles'] })
+  }
+  // Halaman admin baru memakai shell sendiri; tautan ini menjaga navigasi dua arah.
+  if (canManageUsers.value) {
+    items.push(
+      {
+        name: 'admin-templates',
+        label: 'Template',
+        icon: 'layout',
+        activeRoutes: [],
+        path: '/admin/template',
+      },
+      {
+        name: 'admin-membership',
+        label: 'Membership',
+        icon: 'credit-card',
+        activeRoutes: [],
+        path: '/admin/membership',
+      },
+    )
   }
   return items
 })
@@ -256,7 +277,7 @@ onBeforeUnmount(() => {
         >
           <RouterLink
             class="d-flex align-items-center"
-            :to="{ name: item.name }"
+            :to="item.path ?? { name: item.name }"
             @click="closeMobileMenu"
           >
             <FeatherIcon :name="item.icon" />
