@@ -11,10 +11,10 @@ describe('router', () => {
     vi.unstubAllGlobals()
   })
 
-  it('TC-UI-F2-04: landing dan demo publik, dashboard pindah ke /dashboard', () => {
+  it('TC-UI-F2-04: landing dan demo publik, dashboard admin di /admin (SuperAdmin saja)', () => {
     const landing = router.resolve('/')
     const demo = router.resolve('/demo/rustic-hijau')
-    const dashboard = router.resolve('/dashboard')
+    const dashboard = router.resolve('/admin')
 
     expect(landing.name).toBe('landing')
     expect(landing.meta.public).toBe(true)
@@ -23,7 +23,7 @@ describe('router', () => {
     expect(demo.params.slug).toBe('rustic-hijau')
     expect(dashboard.name).toBe('home')
     expect(dashboard.meta.public).toBeUndefined()
-    expect(router.resolve('/users').meta.requireSuperAdmin).toBe(true)
+    expect(dashboard.meta.requireSuperAdmin).toBe(true)
   })
 
   it('TC-UI-F2-05: tautan hash menggulir halus kecuali gerak dikurangi', () => {
@@ -59,11 +59,23 @@ describe('router', () => {
     expect(router.resolve('/app/budget').name).toBe('app-coming-soon')
   })
 
-  it('TC-UI-F3-72: /admin dan /admin/pengguna dialihkan ke halaman lama', () => {
-    expect(router.resolve('/admin').redirectedFrom).toBeUndefined()
-    const admin = router.getRoutes().find((r) => r.path === '/admin')!
-    const users = router.getRoutes().find((r) => r.path === '/admin/pengguna')!
-    expect(admin.redirect).toEqual({ name: 'home' })
-    expect(users.redirect).toEqual({ name: 'users' })
+  it('TC-UI-F5-01: rute lama /dashboard, /users, dan /roles dialihkan ke rute baru', () => {
+    const redirectOf = (path: string) => router.getRoutes().find((r) => r.path === path)!.redirect
+    expect(redirectOf('/dashboard')).toEqual({ name: 'home' })
+    expect(redirectOf('/users')).toEqual({ name: 'admin-users' })
+    expect(redirectOf('/roles')).toEqual({ name: 'admin-roles' })
+  })
+
+  it('TC-UI-F5-02: Pengguna & Role punya tiga rute SuperAdmin; halaman 403 publik', () => {
+    expect(router.resolve('/admin/pengguna').name).toBe('admin-users')
+    expect(router.resolve('/admin/pengguna/role').name).toBe('admin-roles')
+    const access = router.resolve('/admin/pengguna/role/abc')
+    expect(access.name).toBe('admin-role-access')
+    expect(access.params.id).toBe('abc')
+    for (const path of ['/admin/pengguna', '/admin/pengguna/role', '/admin/pengguna/role/abc']) {
+      expect(router.resolve(path).meta.requireSuperAdmin).toBe(true)
+    }
+    expect(router.resolve('/403').name).toBe('forbidden')
+    expect(router.resolve('/403').meta.public).toBe(true)
   })
 })

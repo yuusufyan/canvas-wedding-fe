@@ -1678,16 +1678,45 @@ body.nk-modal-open {
   color: var(--nk-brand);
   font-weight: 600;
 }
-.nk-usercard {
+.nk-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 60px;
+  padding: 0 clamp(12px, 2.3vw, 32px);
+  background: var(--nk-app-panel);
+  border-bottom: 1px solid var(--nk-app-line);
+}
+.nk-topbar__menu,
+.nk-topbar__logo {
+  display: none;
+}
+.nk-topbar__user {
+  margin-left: auto;
+}
+.nk-usermenu {
+  position: relative;
+}
+.nk-usermenu__trigger {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: auto;
-  padding: 8px 8px 8px 10px;
+  min-height: 44px;
+  padding: 4px 8px 4px 4px;
+  border: 0;
   border-radius: 12px;
+  background: transparent;
+  color: var(--nk-app-text);
+  cursor: pointer;
+}
+.nk-usermenu__trigger:hover {
   background: var(--nk-app-bg);
 }
-.nk-usercard__avatar {
+.nk-usermenu__avatar {
   display: grid;
   place-items: center;
   flex: none;
@@ -1698,40 +1727,26 @@ body.nk-modal-open {
   color: #fff;
   font-weight: 700;
 }
-.nk-usercard__text {
-  display: grid;
-  flex: 1;
-  min-width: 0;
+.nk-usermenu__text {
+  display: none;
+  text-align: left;
+  line-height: 1.25;
 }
-.nk-usercard__text strong {
+@media (min-width: 576px) {
+  .nk-usermenu__text {
+    display: grid;
+  }
+}
+.nk-usermenu__text strong {
   font-size: 13px;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-.nk-usercard__text small {
+.nk-usermenu__text small {
   font-size: 11px;
   color: var(--nk-app-muted);
 }
-.nk-usercard__logout {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--nk-app-muted);
-  cursor: pointer;
-}
-.nk-usercard__logout:hover {
-  background: var(--nk-app-panel);
-  color: var(--nk-brand);
-}
-.nk-topbar {
-  display: none;
+.nk-usermenu__list {
+  min-width: 180px;
 }
 .nk-backdrop {
   display: none;
@@ -1763,18 +1778,6 @@ body.nk-modal-open {
     z-index: 50;
     background: rgba(31, 30, 28, 0.45);
   }
-  .nk-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 60px;
-    padding: 0 12px;
-    background: var(--nk-app-panel);
-    border-bottom: 1px solid var(--nk-app-line);
-  }
   .nk-topbar__menu {
     display: grid;
     place-items: center;
@@ -1787,6 +1790,7 @@ body.nk-modal-open {
     cursor: pointer;
   }
   .nk-topbar__logo {
+    display: block;
     width: 92px;
   }
 }
@@ -3176,4 +3180,501 @@ body.nk-modal-open {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ====================================================================================
+   Dashboard admin, Pengguna & Role, dan pengaturan izin/menu.
+   ==================================================================================== */
+.nk-status--brand {
+  background: var(--nk-brand-soft);
+  color: var(--nk-brand);
+}
+.nk-person__avatar--info {
+  background: #e4eeff;
+  color: #1f4fbf;
+}
+.nk-selftag {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eceae6;
+  color: var(--nk-app-muted);
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.nk-rowactions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.nk-toolbar__note {
+  font-size: 13px;
+  color: var(--nk-app-muted);
+}
+.nk-backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nk-brand) !important;
+}
+
+/* Tab Pengguna | Role */
+.nk-tabs {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 12px;
+  background: #ebe9e4;
+}
+.nk-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nk-app-muted);
+}
+.nk-tabs__link.is-active {
+  background: var(--nk-app-panel);
+  color: var(--nk-app-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Form tambahan di dialog */
+.nk-field__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--nk-app-muted);
+}
+.nk-linkbtn--start {
+  justify-self: start;
+}
+.nk-textarea {
+  height: auto;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.nk-select--full {
+  width: 100%;
+}
+.nk-selectwrap {
+  position: relative;
+}
+.nk-selectwrap .nk-icon {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--nk-app-muted);
+  pointer-events: none;
+}
+.nk-selectwrap .nk-select:disabled {
+  background: var(--nk-app-bg);
+  color: var(--nk-app-muted);
+}
+.nk-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--nk-app-bg);
+}
+.nk-toggle-row__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.nk-toggle-row__hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--nk-app-muted);
+}
+.nk-toggle-row.is-locked .nk-toggle-row__title {
+  color: var(--nk-app-muted);
+}
+.nk-toggle {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.nk-toggle::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 11px;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: #d6d3cc;
+  transition: background-color 0.15s;
+}
+.nk-toggle::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+.nk-toggle[aria-checked='true']::before {
+  background: var(--nk-brand);
+}
+.nk-toggle[aria-checked='true']::after {
+  transform: translateX(18px);
+}
+.nk-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.nk-userlist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--nk-app-line);
+  border-radius: 10px;
+}
+.nk-userlist li {
+  padding: 10px 12px;
+}
+.nk-userlist li + li {
+  border-top: 1px solid var(--nk-app-line);
+}
+
+/* Kartu umum */
+.nk-card {
+  padding: 18px 20px;
+  border: 1px solid var(--nk-app-line);
+  border-radius: 12px;
+  background: var(--nk-app-panel);
+}
+.nk-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.nk-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.nk-card__sub,
+.nk-card__meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--nk-app-muted);
+}
+.nk-card__link,
+.nk-card__total {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nk-brand) !important;
+}
+.nk-card__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -12px 0;
+}
+
+/* Pengaturan izin dan menu */
+.nk-savebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.nk-savebar__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff1d6;
+  color: #8a5a00;
+  font-size: 12px;
+  font-weight: 600;
+}
+.nk-access {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+@media (min-width: 992px) {
+  .nk-access {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+.nk-access__group {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+}
+.nk-access__legend {
+  display: block;
+  margin: 12px 0 4px;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nk-app-muted);
+}
+.nk-access__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.nk-access__row--menu {
+  cursor: default;
+}
+.nk-access__row.is-added {
+  background: #e3f3e8;
+}
+.nk-access__row.is-removed {
+  background: #fdecea;
+}
+.nk-access__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.nk-access__text code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nk-app-text);
+}
+.nk-access__text small {
+  font-size: 12px;
+  color: var(--nk-app-muted);
+}
+.nk-access__label {
+  flex: 1;
+  font-size: 14px;
+}
+.nk-access__flag {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+.nk-access__flag.is-added {
+  background: #1f6b3f;
+}
+.nk-access__flag.is-removed {
+  background: var(--nk-danger);
+}
+.nk-check {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--nk-brand);
+  cursor: pointer;
+}
+.nk-check:disabled {
+  cursor: not-allowed;
+}
+
+/* Dashboard */
+.nk-dashgrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 992px) {
+  .nk-dashgrid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+.nk-dashstat__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.nk-dashstat__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--nk-brand-soft);
+  color: var(--nk-brand);
+}
+.nk-dashstat__skeleton {
+  height: 56px;
+  margin-top: 8px;
+}
+.nk-dashstat__note {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nk-app-muted);
+}
+.nk-dashstat__note.is-success {
+  color: #1f6b3f;
+}
+.nk-dashstat__note.is-warning {
+  color: #8a5a00;
+}
+.nk-dashcard__skeleton {
+  height: 180px;
+}
+.nk-dashcard__state,
+.nk-dashcard__empty {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--nk-app-muted);
+}
+.nk-bars {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nk-bars__item {
+  display: grid;
+  grid-template-rows: auto 140px auto;
+  justify-items: center;
+  gap: 6px;
+}
+.nk-bars__value {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.nk-bars__track {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 140px;
+}
+.nk-bars__bar {
+  display: block;
+  width: 100%;
+  min-height: 4px;
+  border-radius: 8px 8px 0 0;
+  background: #c9a0ae;
+}
+.nk-bars__bar.is-peak {
+  background: var(--nk-brand);
+}
+.nk-bars__label {
+  font-size: 12px;
+  color: var(--nk-app-muted);
+}
+.nk-hbars {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nk-hbars__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.nk-hbars__name {
+  font-weight: 600;
+}
+.nk-hbars__value {
+  color: var(--nk-app-muted);
+}
+.nk-hbars__track {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: #eceae6;
+}
+.nk-hbars__fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--nk-brand);
+}
+.nk-simplelist {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nk-simplelist__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.nk-activity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nk-activity__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.nk-activity__icon.is-danger {
+  background: #fdecea;
+  color: var(--nk-danger);
+}
+.nk-activity__icon.is-brand {
+  background: var(--nk-brand-soft);
+  color: var(--nk-brand);
+}
+.nk-activity__icon.is-neutral {
+  background: #eceae6;
+  color: var(--nk-app-muted);
+}
+.nk-activity__icon.is-success {
+  background: #e3f3e8;
+  color: #1f6b3f;
+}
+
+/* Vuexy memberi latar pada elemen code; di daftar izin harus polos. */
+.nk-access__text code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
 }

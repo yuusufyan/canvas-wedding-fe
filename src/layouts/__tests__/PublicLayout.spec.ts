@@ -12,7 +12,8 @@ function mountLayout() {
       { path: '/', name: 'landing', component: { template: '<div />' } },
       { path: '/login', name: 'login', component: { template: '<div />' } },
       { path: '/daftar', name: 'register', component: { template: '<div />' } },
-      { path: '/dashboard', name: 'home', component: { template: '<div />' } },
+      { path: '/admin', name: 'home', component: { template: '<div />' } },
+      { path: '/app', name: 'app', component: { template: '<div />' } },
     ],
   })
   return mount(PublicLayout, { slots: { default: '<p>isi</p>' }, global: { plugins: [router] } })
@@ -55,7 +56,7 @@ describe('PublicLayout', () => {
     wrapper.unmount()
   })
 
-  it('TC-UI-F2-56: tamu melihat Masuk ke login dan Mulai gratis ke daftar, pengguna login melihat Dasbor', () => {
+  it('TC-UI-F2-56: tamu melihat Masuk dan Mulai gratis; pengguna login melihat Dasbor (/admin untuk SuperAdmin, /app untuk lainnya)', () => {
     const guest = mountLayout()
     const links = guest.findAll('.nk-nav__actions a')
     expect(links.map((a) => a.text())).toEqual(['Masuk', 'Mulai gratis'])
@@ -66,7 +67,22 @@ describe('PublicLayout', () => {
     const member = mountLayout()
     const actions = member.findAll('.nk-nav__actions a')
     expect(actions.map((a) => a.text())).toEqual(['Dasbor'])
-    expect(actions[0]?.attributes('href')).toBe('/dashboard')
+    expect(actions[0]?.attributes('href')).toBe('/app')
     member.unmount()
+
+    setActivePinia(createPinia())
+    useAuthStore().$patch({
+      isAuthenticated: true,
+      profile: {
+        id: 'a',
+        name: 'Admin',
+        email: 'admin@contoh.test',
+        role: { id: 'r', name: 'SuperAdmin' },
+        is_active: true,
+      },
+    })
+    const admin = mountLayout()
+    expect(admin.find('.nk-nav__actions a').attributes('href')).toBe('/admin')
+    admin.unmount()
   })
 })

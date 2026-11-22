@@ -124,11 +124,11 @@ describe('authGuard', () => {
     expect(result).toBe(true)
   })
 
-  it('redirects to home when the route requires SuperAdmin but user is not SuperAdmin', async () => {
+  it('redirects to the forbidden page when the route requires SuperAdmin but user is not SuperAdmin', async () => {
     mockStore(true, () => Promise.resolve(), false)
 
-    expect(await runGuard(fakeRoute('users', false, true))).toEqual({ name: 'home' })
-    expect(await runGuard(fakeRoute('roles', false, true))).toEqual({ name: 'home' })
+    expect(await runGuard(fakeRoute('users', false, true))).toEqual({ name: 'forbidden' })
+    expect(await runGuard(fakeRoute('roles', false, true))).toEqual({ name: 'forbidden' })
 
     mockStore(true, () => Promise.resolve(), true)
     expect(await runGuard(fakeRoute('users', false, true))).toBe(true)

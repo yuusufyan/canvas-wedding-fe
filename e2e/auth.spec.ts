@@ -89,7 +89,7 @@ test.describe('masuk', () => {
     await page.goto('/login')
     await login(page)
 
-    await expect(page).toHaveURL(/\/dashboard$/)
+    await expect(page).toHaveURL(/\/admin$/)
     expect(await page.evaluate(() => sessionStorage.getItem('canvas-wedding.refresh-token'))).toBe(
       'mock-refresh-token',
     )

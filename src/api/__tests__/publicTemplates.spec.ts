@@ -82,7 +82,7 @@ describe('mock API', () => {
     const demo = await call('/api/v1/public/templates/rustic-hijau/demo')
     expect((await demo.json()).data.document.pages).toHaveLength(9)
 
-    await call('/api/v1/users')
+    await call('/api/v1/tidak-dikenal')
     expect(realFetch).toHaveBeenCalledTimes(1)
   })
 

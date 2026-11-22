@@ -60,7 +60,10 @@ onMounted(() => {
             </ul>
             <div class="nk-nav__actions">
               <template v-if="authStore.isAuthenticated">
-                <RouterLink class="nk-btn nk-btn--primary nk-btn--sm" :to="{ name: 'home' }">
+                <RouterLink
+                  class="nk-btn nk-btn--primary nk-btn--sm"
+                  :to="authStore.isSuperAdmin ? { name: 'home' } : '/app'"
+                >
                   Dasbor
                 </RouterLink>
               </template>

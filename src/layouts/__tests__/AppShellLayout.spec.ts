@@ -87,7 +87,9 @@ describe('AppShellLayout', () => {
     expect(wrapper.find('nav[aria-label="Menu utama"]').exists()).toBe(true)
     expect(wrapper.find('main#konten-utama .probe').text()).toBe('isi')
     expect(wrapper.find('a[aria-current="page"]').text()).toBe('Template')
-    expect(wrapper.find('.nk-usercard').text()).toContain('Admin Utama')
+    expect(wrapper.find('.nk-usermenu__trigger').text()).toContain('Admin Utama')
+    expect(wrapper.find('.nk-usermenu__trigger').text()).toContain('SuperAdmin')
+    expect(wrapper.find('.nk-usercard').exists()).toBe(false)
     expect(document.body.classList.contains('blank-page')).toBe(false)
     wrapper.unmount()
   })
@@ -108,9 +110,8 @@ describe('AppShellLayout', () => {
     signIn('SuperAdmin', [])
     const admin = await mountShell(createTestRouter())
     expect(admin.findAll('.nk-sidebar__nav a').map((a) => a.text())).toEqual([
-      'Beranda',
-      'Pengguna',
-      'Role',
+      'Dashboard',
+      'Pengguna & Role',
     ])
     admin.unmount()
 
@@ -177,7 +178,9 @@ describe('AppShellLayout', () => {
     const router = createTestRouter()
     const wrapper = await mountShell(router)
 
-    const button = wrapper.find('button[aria-label="Keluar"]')
+    await wrapper.find('.nk-usermenu__trigger').trigger('click')
+    const button = wrapper.find('[role="menuitem"]')
+    expect(button.text()).toBe('Keluar')
     await button.trigger('click')
     await button.trigger('click')
     await flushPromises()

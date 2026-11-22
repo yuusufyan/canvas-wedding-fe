@@ -11,12 +11,14 @@ const props = withDefaults(
     /** Teks yang harus diketik persis agar tombol aktif. */
     expected: string
     confirmLabel: string
+    /** Label kolom ketik; default untuk nama template. */
+    inputLabel?: string
     busy?: boolean
     /** Aturan bisnis melarang aksi: tombol tetap nonaktif. */
     blocked?: boolean
     error?: string
   }>(),
-  { busy: false, blocked: false, error: '' },
+  { busy: false, blocked: false, error: '', inputLabel: 'Ketik nama template untuk konfirmasi' },
 )
 
 const emit = defineEmits<{ close: []; confirm: [] }>()
@@ -59,7 +61,7 @@ function submit(): void {
     <slot />
 
     <form class="nk-form" @submit.prevent="submit">
-      <label class="nk-label" :for="inputId">Ketik nama template untuk konfirmasi</label>
+      <label class="nk-label" :for="inputId">{{ inputLabel }}</label>
       <input
         :id="inputId"
         v-model="typed"

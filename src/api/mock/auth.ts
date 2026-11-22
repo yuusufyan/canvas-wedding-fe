@@ -3,14 +3,29 @@ import type { MeResponse, MenuItem, TokenResponse } from '@/types/auth'
 import { MOCK_ACCESS_TOKEN, MOCK_REFRESH_TOKEN, fail, json, ok, type MockHandler } from './http'
 
 const AUTH = `${API_BASE_PATH}/auth`
-const MOCK_EMAIL = 'admin@contoh.test'
+export const MOCK_EMAIL = 'admin@contoh.test'
+export const MOCK_ME_ID = '00000000-0000-4000-8000-000000000001'
+export const MOCK_SUPERADMIN_ROLE_ID = '00000000-0000-4000-8000-0000000000a1'
+
+export const MOCK_PERMISSIONS = [
+  ['templates.read', 'Melihat template'],
+  ['templates.write', 'Membuat, mengubah, dan mengarsipkan template'],
+  ['invitations.read', 'Melihat undangan'],
+  ['invitations.write', 'Membuat dan mengubah undangan'],
+  ['guests.read', 'Melihat tamu, RSVP, dan ucapan'],
+  ['guests.write', 'Mengelola tamu dan mengirim undangan'],
+  ['budget.read', 'Melihat budget'],
+  ['budget.write', 'Mengelola budget'],
+  ['membership.read', 'Melihat status membership'],
+  ['membership.write', 'Mengelola membership'],
+].map(([code, description]) => ({ code: code!, description: description! }))
 
 function menu(key: string, label: string, path: string, icon: string, sortOrder: number): MenuItem {
   return { key, label, path, icon, parent_key: null, sort_order: sortOrder }
 }
 
 // Menu SuperAdmin mengikuti seed backend (auth-register-rbac, draf).
-const ADMIN_MENUS: MenuItem[] = [
+export const ADMIN_MENUS: MenuItem[] = [
   menu('admin.dashboard', 'Dashboard', '/admin', 'grid', 10),
   menu('admin.templates', 'Template', '/admin/template', 'layout', 20),
   menu('admin.invitations', 'Undangan', '/admin/undangan', 'mail', 30),
@@ -20,15 +35,25 @@ const ADMIN_MENUS: MenuItem[] = [
   menu('admin.settings', 'Pengaturan', '/admin/pengaturan', 'settings', 90),
 ]
 
+// Menu area pelanggan (seed backend), dipakai katalog /menus dan pengaturan role.
+export const APP_MENUS: MenuItem[] = [
+  menu('app.home', 'Beranda', '/app', 'home', 10),
+  menu('app.invitations', 'Undanganku', '/app/undangan', 'mail', 20),
+  menu('app.budget', 'Budget', '/app/budget', 'wallet', 30),
+  menu('app.guests', 'Tamu & RSVP', '/app/tamu', 'users', 40),
+  menu('app.templates', 'Template', '/app/template', 'layout', 50),
+  menu('app.settings', 'Pengaturan', '/app/pengaturan', 'settings', 90),
+]
+
 const ME: MeResponse = {
-  id: '00000000-0000-4000-8000-000000000001',
+  id: MOCK_ME_ID,
   name: 'Admin Utama',
   email: MOCK_EMAIL,
-  role: { id: '00000000-0000-4000-8000-0000000000a1', name: 'SuperAdmin' },
+  role: { id: MOCK_SUPERADMIN_ROLE_ID, name: 'SuperAdmin' },
   is_active: true,
   created_at: '2026-01-01T00:00:00.000Z',
   updated_at: '2026-01-01T00:00:00.000Z',
-  permissions: [],
+  permissions: MOCK_PERMISSIONS.map((p) => p.code),
   menus: ADMIN_MENUS,
 }
 

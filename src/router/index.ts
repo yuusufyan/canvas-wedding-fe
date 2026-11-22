@@ -24,14 +24,15 @@ const router = createRouter({
       component: () => import('../views/DemoView.vue'),
       meta: { public: true },
     },
-    {
-      path: '/dashboard',
-      name: 'home',
-      component: () => import('../views/HomeView.vue'),
-    },
     // Rute admin: path mengikuti katalog menu backend (auth-register-rbac). Menu tanpa halaman
-    // memakai ComingSoonView; Pengguna & Role tetap di halaman lama (/users, /roles).
-    { path: '/admin', redirect: { name: 'home' } },
+    // memakai ComingSoonView. Rute lama (/dashboard, /users, /roles) dialihkan agar bookmark tetap jalan.
+    { path: '/dashboard', redirect: { name: 'home' } },
+    {
+      path: '/admin',
+      name: 'home',
+      component: () => import('../views/AdminDashboardView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
     {
       path: '/admin/template',
       name: 'admin-templates',
@@ -50,7 +51,26 @@ const router = createRouter({
       component: () => import('../views/AdminMembershipView.vue'),
       meta: { requireSuperAdmin: true },
     },
-    { path: '/admin/pengguna', redirect: { name: 'users' } },
+    {
+      path: '/admin/pengguna',
+      name: 'admin-users',
+      component: () => import('../views/AdminUsersView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    {
+      path: '/admin/pengguna/role',
+      name: 'admin-roles',
+      component: () => import('../views/AdminRolesView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    {
+      path: '/admin/pengguna/role/:id',
+      name: 'admin-role-access',
+      component: () => import('../views/AdminRoleAccessView.vue'),
+      meta: { requireSuperAdmin: true },
+    },
+    { path: '/users', redirect: { name: 'admin-users' } },
+    { path: '/roles', redirect: { name: 'admin-roles' } },
     {
       path: '/admin/:section(undangan|tamu|pengaturan)',
       name: 'admin-coming-soon',
@@ -63,16 +83,10 @@ const router = createRouter({
       component: () => import('../views/ComingSoonView.vue'),
     },
     {
-      path: '/users',
-      name: 'users',
-      component: () => import('../views/UsersView.vue'),
-      meta: { requireSuperAdmin: true },
-    },
-    {
-      path: '/roles',
-      name: 'roles',
-      component: () => import('../views/RolesView.vue'),
-      meta: { requireSuperAdmin: true },
+      path: '/403',
+      name: 'forbidden',
+      component: () => import('../views/ForbiddenView.vue'),
+      meta: { public: true },
     },
     {
       path: '/login',

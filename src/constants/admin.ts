@@ -1,7 +1,7 @@
 import type { MembershipStatus, TemplateStatus } from '@/types/admin'
 import type { TemplateAccess } from '@/types/invitation-document'
 
-export type StatusTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+export type StatusTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'brand'
 
 export const TEMPLATE_STATUSES: readonly TemplateStatus[] = ['Terbit', 'Draft', 'Arsip']
 export const TEMPLATE_ACCESSES: readonly TemplateAccess[] = ['Gratis', 'Premium']

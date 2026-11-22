@@ -4,15 +4,27 @@ import type { TokenResponse } from '@/types/auth'
 import { clearSession, getAccessToken, getRefreshToken, setSession } from './token'
 
 // Thrown by apiRequest for any non-2xx response or network failure. Carries
-// only the status and a message generated here, never the response body or
-// headers (SR-04) — the backend's `message` is never attached to this error.
+// the status and a message generated here (SR-04). `serverMessage` is the
+// backend's `message` text, kept only so callers can tell apart responses that
+// share a status (mis. tiga arti 409); it is never shown to the user as-is.
 export class ApiError extends Error {
   readonly status: number
+  readonly serverMessage?: string
 
-  constructor(status: number) {
+  constructor(status: number, serverMessage?: string) {
     super(`Permintaan API gagal dengan status ${status}.`)
     this.name = 'ApiError'
     this.status = status
+    this.serverMessage = serverMessage
+  }
+}
+
+async function readServerMessage(response: Response): Promise<string | undefined> {
+  try {
+    const body = (await response.json()) as { message?: unknown }
+    return typeof body.message === 'string' ? body.message : undefined
+  } catch {
+    return undefined
   }
 }
 
@@ -65,7 +77,7 @@ async function sendEnvelopeRequest<T>(
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status)
+    throw new ApiError(response.status, await readServerMessage(response))
   }
 
   if (response.status === 204) {
@@ -178,7 +190,8 @@ export async function apiRequestPaginated<T>(
 ): Promise<PaginatedResult<T>> {
   const envelope = await requestEnvelope<T[]>(path, init)
   return {
-    data: envelope.data,
+    // Backend menghilangkan key `data` untuk daftar kosong (omitempty).
+    data: envelope.data ?? [],
     meta: envelope.meta ?? DEFAULT_META,
   }
 }

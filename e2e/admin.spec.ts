@@ -73,7 +73,7 @@ test.describe('shell desktop', () => {
     await expect(page.getByRole('button', { name: 'Buka menu navigasi' })).toBeHidden()
   })
 
-  test('TC-UI-F3-82: menu tanpa halaman membuka segera hadir; Pengguna & Role tetap di halaman lama', async ({
+  test('TC-UI-F3-82: menu tanpa halaman membuka segera hadir; Pengguna & Role membuka halaman barunya', async ({
     page,
   }) => {
     await signIn(page)
@@ -85,11 +85,10 @@ test.describe('shell desktop', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Undangan segera hadir')
 
     await nav.getByRole('link', { name: 'Pengguna & Role' }).click()
-    await expect(page).toHaveURL(/\/users$/)
-    const oldNav = page.getByRole('navigation', { name: 'Menu utama' })
-    await expect(oldNav.getByRole('link', { name: 'Template' })).toBeVisible()
+    await expect(page).toHaveURL(/\/admin\/pengguna$/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pengguna & Role')
 
-    await oldNav.getByRole('link', { name: 'Membership' }).click()
+    await nav.getByRole('link', { name: 'Membership' }).click()
     await expect(page).toHaveURL(/\/admin\/membership$/)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Membership')
   })

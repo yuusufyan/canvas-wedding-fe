@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test'
+const b = await chromium.launch()
+const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } })
+await ctx.addInitScript(() => sessionStorage.setItem('canvas-wedding.refresh-token', 'mock-refresh-token'))
+const p = await ctx.newPage()
+p.on('console', (m) => console.log('console', m.type(), m.text().slice(0, 300)))
+p.on('pageerror', (e) => console.log('pageerror', String(e).slice(0, 400)))
+p.on('response', (r) => { if (r.url().includes('/api/') || r.status() >= 400) console.log('resp', r.status(), r.url()) })
+await p.goto('http://localhost:5173/admin/pengguna')
+await p.waitForTimeout(3000)
+console.log(await p.evaluate(() => document.querySelector('.nk-page')?.innerText.slice(0, 200)))
+await b.close()

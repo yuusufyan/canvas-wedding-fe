@@ -28,7 +28,7 @@ export const authGuard: NavigationGuardWithThis<undefined> = async (to) => {
   }
 
   if (to.meta.requireSuperAdmin && !authStore.isSuperAdmin) {
-    return { name: 'home' }
+    return { name: 'forbidden' }
   }
 
   return true

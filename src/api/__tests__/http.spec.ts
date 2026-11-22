@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { apiRequest, ApiError, refreshAccessToken, setSessionExpiredCallback } from '../http'
+import {
+  apiRequest,
+  apiRequestPaginated,
+  ApiError,
+  refreshAccessToken,
+  setSessionExpiredCallback,
+} from '../http'
 import { clearSession, getAccessToken, getRefreshToken, setSession } from '../token'
 import type { TokenResponse } from '@/types/auth'
 
@@ -194,5 +200,57 @@ describe('apiRequest', () => {
     const refreshed = await refreshAccessToken()
     expect(refreshed).toBe(false)
     expect(refreshCalls).toBe(1)
+  })
+
+  it('TC-UI-F5-61: daftar tanpa key data (omitempty) menjadi array kosong dengan meta bawaan', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<FetchMock>(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({ code: 200, status: 'OK', message: 'ok' }),
+      })),
+    )
+
+    const result = await apiRequestPaginated<{ id: string }>('/users', { method: 'GET' })
+
+    expect(result.data).toEqual([])
+    expect(result.meta.total).toBe(0)
+  })
+
+  it('TC-UI-F5-62: ApiError membawa message BE hanya sebagai serverMessage, bukan sebagai message error', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<FetchMock>(async () => ({
+        ok: false,
+        status: 409,
+        json: async () => ({ code: 409, status: 'error', message: 'Email already registered' }),
+      })),
+    )
+
+    const error = await apiRequest('/users', { method: 'POST', body: {} }).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect((error as ApiError).status).toBe(409)
+    expect((error as ApiError).serverMessage).toBe('Email already registered')
+    expect((error as ApiError).message).toBe('Permintaan API gagal dengan status 409.')
+  })
+
+  it('TC-UI-F5-63: body error yang bukan JSON tidak memecahkan ApiError', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<FetchMock>(async () => ({
+        ok: false,
+        status: 502,
+        json: async () => {
+          throw new SyntaxError('bukan json')
+        },
+      })),
+    )
+
+    const error = await apiRequest('/users', { method: 'GET' }).catch((e: unknown) => e)
+
+    expect((error as ApiError).status).toBe(502)
+    expect((error as ApiError).serverMessage).toBeUndefined()
   })
 })

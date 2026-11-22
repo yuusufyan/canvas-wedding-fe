@@ -3,8 +3,8 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import NkIcon from '@/components/NkIcon.vue'
 import ToastHost from '@/components/ToastHost.vue'
+import UserMenu from '@/components/UserMenu.vue'
 import { MENU_ICON_FALLBACK, MENU_ICONS } from '@/constants/menu-icons'
-import { ROLES } from '@/constants/roles'
 import { useAuthStore } from '@/stores/auth'
 import type { MenuItem } from '@/types/auth'
 
@@ -18,33 +18,21 @@ const toggleButton = ref<HTMLButtonElement | null>(null)
 const sidebar = ref<HTMLElement | null>(null)
 
 // Menu cadangan saat /auth/me belum mengirim menus[] (backend lama): hanya rute yang ada.
-const FALLBACK_MENUS: MenuItem[] = [
-  {
-    key: 'fallback.home',
-    label: 'Beranda',
-    path: '/dashboard',
-    icon: 'home',
-    parent_key: null,
-    sort_order: 10,
-  },
-]
+function fallbackMenu(
+  key: string,
+  label: string,
+  path: string,
+  icon: string,
+  order: number,
+): MenuItem {
+  return { key, label, path, icon, parent_key: null, sort_order: order }
+}
 const FALLBACK_ADMIN_MENUS: MenuItem[] = [
-  {
-    key: 'fallback.users',
-    label: 'Pengguna',
-    path: '/users',
-    icon: 'users',
-    parent_key: null,
-    sort_order: 20,
-  },
-  {
-    key: 'fallback.roles',
-    label: 'Role',
-    path: '/roles',
-    icon: 'user-cog',
-    parent_key: null,
-    sort_order: 30,
-  },
+  fallbackMenu('fallback.home', 'Dashboard', '/admin', 'grid', 10),
+  fallbackMenu('fallback.users', 'Pengguna & Role', '/admin/pengguna', 'user-cog', 50),
+]
+const FALLBACK_USER_MENUS: MenuItem[] = [
+  fallbackMenu('fallback.app', 'Beranda', '/app', 'home', 10),
 ]
 
 interface MenuNode {
@@ -61,17 +49,14 @@ const menuTree = computed<MenuNode[]>(() => {
     authStore.menus.length > 0
       ? authStore.menus
       : authStore.isSuperAdmin
-        ? [...FALLBACK_MENUS, ...FALLBACK_ADMIN_MENUS]
-        : FALLBACK_MENUS
+        ? FALLBACK_ADMIN_MENUS
+        : FALLBACK_USER_MENUS
   const parents = source.filter((m) => !m.parent_key).sort(bySort)
   return parents.map((item) => ({
     item,
     children: source.filter((m) => m.parent_key === item.key).sort(bySort),
   }))
 })
-
-const avatarInitial = computed(() => authStore.profile?.name.charAt(0).toUpperCase() ?? '')
-const roleLabel = computed(() => authStore.profile?.role.name ?? ROLES.SUPERADMIN)
 
 function iconFor(item: MenuItem) {
   return (item.icon && MENU_ICONS[item.icon]) || MENU_ICON_FALLBACK
@@ -174,23 +159,6 @@ async function logout(): Promise<void> {
           </li>
         </ul>
       </nav>
-
-      <div class="nk-usercard">
-        <span class="nk-usercard__avatar" aria-hidden="true">{{ avatarInitial }}</span>
-        <span class="nk-usercard__text">
-          <strong>{{ authStore.profile?.name }}</strong>
-          <small>{{ roleLabel }}</small>
-        </span>
-        <button
-          type="button"
-          class="nk-usercard__logout"
-          aria-label="Keluar"
-          :disabled="loggingOut"
-          @click="logout"
-        >
-          <NkIcon name="log-out" :size="18" />
-        </button>
-      </div>
     </aside>
 
     <div
@@ -220,6 +188,7 @@ async function logout(): Promise<void> {
         >
           <img src="/brand/niskala-daisy-logo.png" alt="" width="1080" height="1080" />
         </RouterLink>
+        <UserMenu class="nk-topbar__user" :busy="loggingOut" @logout="logout" />
       </header>
 
       <main id="konten-utama" class="nk-app__content" tabindex="-1">
