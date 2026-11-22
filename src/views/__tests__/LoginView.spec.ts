@@ -34,6 +34,8 @@ function createTestRouter(): Router {
     history: createMemoryHistory(),
     routes: [
       { path: '/login', name: 'login', component: LoginView },
+      { path: '/landing', name: 'landing', component: { template: '<div />' } },
+      { path: '/daftar', name: 'register', component: { template: '<div />' } },
       { path: '/', name: 'home', component: { template: '<div>home</div>' } },
     ],
   })
@@ -88,7 +90,7 @@ describe('LoginView', () => {
     await wrapper.find('form').trigger('submit')
 
     expect(fetchMock).not.toHaveBeenCalled()
-    expect(wrapper.text()).toContain('Format email belum valid.')
+    expect(wrapper.text()).toContain('Format email tidak valid.')
   })
 
   it('TC-UNIT-32: a second click while submitting is ignored, fetch runs once', async () => {
@@ -127,7 +129,7 @@ describe('LoginView', () => {
     await wrapper.find('#login-password').setValue('rahasia123')
     expect(wrapper.find('#login-password').attributes('type')).toBe('password')
 
-    await wrapper.find('button.input-group-text').trigger('click')
+    await wrapper.find('button[aria-label="Tampilkan kata sandi"]').trigger('click')
     expect(wrapper.find('#login-password').attributes('type')).toBe('text')
 
     wrapper.unmount()
@@ -145,7 +147,7 @@ describe('LoginView', () => {
     await wrapper.find('form').trigger('submit')
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Email atau kata sandi salah.')
+    expect(wrapper.text()).toContain('Email atau kata sandi salah')
     expect(wrapper.find<HTMLInputElement>('#login-password').element.value).toBe('')
     expect(wrapper.find<HTMLInputElement>('#login-email').element.value).toBe('admin@example.com')
   })
@@ -162,7 +164,7 @@ describe('LoginView', () => {
     expect(email.attributes('spellcheck')).toBe('false')
     expect(password.attributes('spellcheck')).toBe('false')
 
-    await wrapper.find('button.input-group-text').trigger('click')
+    await wrapper.find('button[aria-label="Tampilkan kata sandi"]').trigger('click')
     expect(password.attributes('spellcheck')).toBe('false')
 
     expect(form.element.getAttribute('action')).toBeNull()

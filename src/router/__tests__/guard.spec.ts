@@ -63,12 +63,25 @@ describe('authGuard', () => {
     expect(result).toEqual({ name: 'login' })
   })
 
-  it('TC-UNIT-28: redirects an authenticated visitor away from the login route', async () => {
+  it('TC-UNIT-28: redirects an authenticated SuperAdmin away from the login and register routes', async () => {
+    mockStore(true, () => Promise.resolve(), true)
+
+    expect(await runGuard(fakeRoute('login', true))).toEqual({ name: 'home' })
+    expect(await runGuard(fakeRoute('register', true))).toEqual({ name: 'home' })
+  })
+
+  it('TC-UI-F4-01: other authenticated roles are redirected from login and register to /app', async () => {
     mockStore(true)
 
-    const result = await runGuard(fakeRoute('login', true))
+    expect(await runGuard(fakeRoute('login', true))).toBe('/app')
+    expect(await runGuard(fakeRoute('register', true))).toBe('/app')
+  })
 
-    expect(result).toEqual({ name: 'home' })
+  it('TC-UI-F4-02: the activation and check-email routes stay reachable while signed in', async () => {
+    mockStore(true)
+
+    expect(await runGuard(fakeRoute('activate', true))).toBe(true)
+    expect(await runGuard(fakeRoute('check-email', true))).toBe(true)
   })
 
   it('TC-UNIT-29: waits for a pending bootstrap before deciding', async () => {
@@ -111,11 +124,11 @@ describe('authGuard', () => {
     expect(result).toBe(true)
   })
 
-  it('redirects to home when the route requires SuperAdmin but user is not SuperAdmin', async () => {
+  it('redirects to the forbidden page when the route requires SuperAdmin but user is not SuperAdmin', async () => {
     mockStore(true, () => Promise.resolve(), false)
 
-    expect(await runGuard(fakeRoute('users', false, true))).toEqual({ name: 'home' })
-    expect(await runGuard(fakeRoute('roles', false, true))).toEqual({ name: 'home' })
+    expect(await runGuard(fakeRoute('users', false, true))).toEqual({ name: 'forbidden' })
+    expect(await runGuard(fakeRoute('roles', false, true))).toEqual({ name: 'forbidden' })
 
     mockStore(true, () => Promise.resolve(), true)
     expect(await runGuard(fakeRoute('users', false, true))).toBe(true)

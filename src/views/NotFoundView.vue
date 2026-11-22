@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import BlankLayout from '@/layouts/BlankLayout.vue'
+import { RouterLink } from 'vue-router'
+import NkIcon from '@/components/NkIcon.vue'
+import StatusPanel from '@/components/StatusPanel.vue'
+import { useDocumentTitle } from '@/composables/useDocumentTitle'
+import AuthLayout from '@/layouts/AuthLayout.vue'
+
+useDocumentTitle('Halaman tidak ditemukan')
 </script>
 
 <template>
-  <BlankLayout>
-    <div class="misc-wrapper">
-      <div class="brand-logo">
-        <img src="/vuexy/app-assets/images/logo/logo.svg" height="28" alt="" />
-        <h2 class="brand-text text-primary ms-1">Sales Order</h2>
-      </div>
-      <div class="misc-inner p-2 p-sm-3">
-        <div class="w-100 text-center">
-          <h1 class="mb-1">Halaman tidak ditemukan</h1>
-          <p class="mb-2">
-            Alamat ini tidak ada atau sudah dipindahkan. Periksa kembali tautannya.
-          </p>
-          <img class="img-fluid" src="/vuexy/app-assets/images/pages/error.svg" alt="" />
-        </div>
-      </div>
-    </div>
-  </BlankLayout>
+  <AuthLayout>
+    <StatusPanel icon="alert-circle" tone="warning" title="Halaman tidak ditemukan">
+      Alamat ini tidak ada atau sudah dipindahkan. Periksa kembali tautannya.
+      <template #actions>
+        <RouterLink class="nk-btn nk-btn--primary nk-btn--block" :to="{ name: 'landing' }">
+          Kembali ke beranda
+          <NkIcon name="arrow-right" :size="18" />
+        </RouterLink>
+      </template>
+    </StatusPanel>
+  </AuthLayout>
 </template>

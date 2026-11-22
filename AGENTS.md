@@ -1,30 +1,38 @@
 # AGENTS.md — canvas-wedding-fe
 
-Aturan utama untuk semua agent di repo ini. Baca seluruh file ini sebelum mengubah
+Aturan utama untuk semua kontributor di repo ini. Baca seluruh file ini sebelum mengubah
 kode. Jika permintaan bertentangan dengan file ini, tanyakan pemilik repo; jangan
 memilih sendiri.
 
 ## Project profile
 
-Frontend untuk User Management platform "Canvas Wedding", terhubung ke
-`canvas-wedding-api` (Go Fiber v3, PostgreSQL 17, Redis 7.4): login SuperAdmin/User,
-profil pengguna aktif, manajemen peran/role (`/api/v1/roles`), dan manajemen
-pengguna (`/api/v1/users`).
+Frontend platform undangan pernikahan digital "Niskala Daisy" (repo `canvas-wedding-fe`),
+terhubung ke `canvas-wedding-api` (Go Fiber v3, PostgreSQL 17, Redis 7.4). Cakupan:
+landing publik dan demo undangan, login, manajemen peran/role (`/api/v1/roles`) dan pengguna
+(`/api/v1/users`) untuk SuperAdmin. Dalam rencana bertahap
+(`docs/features/niskala-ui/change-plan.md`): admin template/membership, area pelanggan
+(beranda, budget, tamu/RSVP), dan editor Canvas. Fitur yang endpoint-nya belum ada di backend
+dibangun terhadap klien API bertipe dengan data contoh (`src/api/mock`).
 
-Status (2026-11-14): frontend SPA berbasis Vue 3.5 + Vuexy dengan dukungan login,
-dashboard, manajemen user, dan manajemen role terhubung ke `canvas-wedding-api`.
+Status (2026-11-20): SPA Vue 3.5 dengan login, dashboard, manajemen user dan role terhubung
+ke `canvas-wedding-api`, plus landing publik dan demo undangan (data contoh).
 
 - **Bahasa & runtime:** TypeScript 6.0, Node.js (lokal: v26.13.0, npm 11.20.0;
   `engines`: `^22.18.0 || >=24.12.0`)
 - **Framework:** Vue 3.5 (Composition API, `<script setup lang="ts">`) + Vite 8,
   `vue-router` 5, `pinia` 4. HTTP client: `fetch` bawaan browser lewat wrapper di
   `src/api/`.
-- **Tampilan:** design system Vuexy (Bootstrap 5.1, Feather Icons, font Montserrat,
-  palet One SMF, tema `semi-dark-layout`). CSS, font,
-  dan gambar Vuexy disalin dari aset skill `vuexy-html` ke `public/vuexy/` dan dimuat
-  lewat `<link>` di `index.html`. jQuery dan JS Vuexy
-  **tidak** dipakai; perilaku (menu, collapse, dropdown, modal) ditulis ulang di Vue.
-  Ikon: `feather-icons` 4.29 lewat `src/components/FeatherIcon.vue`.
+- **Tampilan:** halaman aplikasi yang sudah ada memakai design system Vuexy (Bootstrap 5.1,
+  Feather Icons, font Montserrat, tema `semi-dark-layout`). CSS, font, dan gambar Vuexy
+  disalin dari aset skill `vuexy-html` ke `public/vuexy/` dan dimuat lewat `<link>` di
+  `index.html`. jQuery dan JS Vuexy **tidak** dipakai; perilaku (menu, collapse, dropdown,
+  modal) ditulis ulang di Vue. Identitas brand Niskala Daisy (burgundy, krem, emas) ada di satu
+  berkas `src/styles/niskala.css` yang diimpor di `main.ts` setelah CSS Vuexy: token `--nk-*`,
+  `@font-face`, dan kelas berawalan `nk-` untuk halaman publik. Font Inter, Cormorant
+  Garamond, Jost, dan Great Vibes dipasang lokal di `public/fonts/` (OFL). Halaman Vuexy
+  lama tetap Montserrat sampai dimigrasi per fase.
+  Ikon: `feather-icons` 4.29 lewat `src/components/FeatherIcon.vue`; ikon yang tidak ada di
+  Feather (mahkota, kilau, dll.) lewat `src/components/NkIcon.vue` (path Lucide, ISC).
 - **Database / ORM:** tidak ada (semua data lewat API backend).
 - **Layanan pendukung:** backend `canvas-wedding-api` (lihat `Workspace`).
 - **Arsitektur:** SPA, route di-lazy-load per view.
@@ -66,30 +74,33 @@ Perintah bertanda ✓ sudah dijalankan dan lolos pada 2026-11-09.
 | fe | canvas-wedding-fe | . | ./AGENTS.md |
 | be | canvas-wedding-api | ../canvas-wedding-api | ../canvas-wedding-api/AGENTS.md |
 
-Jalankan Claude Code dari repo ini dengan `claude --add-dir ../canvas-wedding-api` agar
-repo backend bisa dibaca. Kontrak API diambil dari Swagger backend dan
+Repo backend dibaca dari path relatif di atas. Kontrak API diambil dari Swagger backend dan
 `../canvas-wedding-api/README.md` serta DTO di `internal/dto/`. Perubahan kode backend
 dikerjakan di repo backend mengikuti AGENTS.md backend.
 
 ## Test environment
 
 Frontend saja (tanpa backend) sudah berjalan: Playwright menyalakan `npm run dev` sendiri
-(`webServer` di `playwright.config.ts`). Integrasi dengan backend belum ada; usulan minimal:
+(`webServer` di `playwright.config.ts`) dengan `VITE_USE_MOCK_API=true`, sehingga landing dan
+demo dilayani data contoh dari `src/api/mock` (hanya mode dev, tidak masuk bundle produksi).
+Mode uji manual: `window.__nkMock = 'empty' | 'error' | 'slow'`. Integrasi dengan backend
+sungguhan belum ada; usulan minimal:
 
 - Dependensi backend: di repo BE `npm run test:db:up` (PostgreSQL 17 port 5433, Redis 7
   port 6380, dari `docker-compose.test.yml`), migration ke DB test, lalu backend
   dijalankan dengan `test/test.env` (nilai palsu). TODO(verifikasi): BE belum punya
   script "start dengan env test" untuk E2E lintas repo.
-- Backend untuk test: base URL `http://localhost:3000/api/v1`. TODO(verifikasi): BE
-  belum punya endpoint health.
+- Backend untuk test: base URL `http://localhost:8080/api/v1` (proxy dev `/api`); BE
+  punya `GET /health`. TODO(verifikasi): script menjalankan BE dengan env test untuk E2E lintas repo.
 - Frontend untuk E2E: `npm run dev` (Vite, default `http://localhost:5173`) dengan proxy
   Vite `/api` → backend (lihat Known issue 1).
 - File env test: usulan `e2e/e2e.env` (nilai palsu: base URL, username/password user test).
   Variabel yang terbaca di browser wajib berawalan `VITE_` dan tidak boleh berisi secret.
-- Identitas test per role: user seed backend `superadmin`, `admin`, `sales`
-  (`superadmin@example.com`, ...); token lewat `POST /api/v1/auth/login`
-  (`{ identifier, password }`). Password test palsu ada di env test BE.
-- Data seed test: TODO(verifikasi): fixture produk dan customer fiktif untuk E2E.
+- Identitas test per role: SuperAdmin dibuat lewat CLI bootstrap BE (`make bootstrap-superadmin`);
+  token lewat `POST /api/v1/auth/login` (`{ email, password }`). Data test memakai domain
+  `contoh.test`; password test palsu ada di env test BE.
+- Data seed test: hanya role `SuperAdmin` dari migration BE; data template/undangan fiktif
+  datang dari mock FE sampai endpoint-nya ada.
 - Framework: unit/component Vitest 4 + `@vue/test-utils` + jsdom
   (`src/**/__tests__/*.spec.ts`), E2E Playwright 1.65 (`e2e/*.spec.ts`). Mock API di
   component test: TODO(verifikasi) (usulan MSW, dependency baru).
@@ -103,19 +114,27 @@ Folder bertanda * belum ada (usulan).
 index.html             <link> CSS Vuexy, class tema di <html>/<body>
 public/
   vuexy/               CSS, font Montserrat, logo, ilustrasi Vuexy (salinan aset skill; jangan diedit)
+  fonts/               Inter, Cormorant Garamond, Jost, Great Vibes (woff2 subset Latin, OFL)
+  brand/               logo Niskala Daisy (burgundy dan putih)
 src/
   main.ts              bootstrap app, router, pinia
   App.vue              hanya <RouterView>
   router/              route (lazy-load) + guard login & permission*
-  layouts/             BlankLayout (login, error); VerticalLayout* (sidebar semi-dark, navbar)
-  views/               halaman per domain; sekarang NotFoundView
-  components/          komponen bersama: FeatherIcon; tabel paginasi*, dialog konfirmasi*, state kosong/error*
+  config.ts            satu-satunya pembaca import.meta.env (pemuat mock API)
+  styles/niskala.css   token brand, @font-face, kelas nk- (satu-satunya CSS Niskala)
+  layouts/             BlankLayout (login, error); VerticalLayout (sidebar semi-dark, navbar);
+                       PublicLayout (landing: header, footer, menu hamburger)
+  views/               halaman per domain; landing/ berisi section LandingView
+                       (hero, statistik, cara kerja, editor, galeri, harga, FAQ, CTA)
+  components/          komponen bersama: FeatherIcon, NkIcon, InvitationRenderer (baca-saja), DemoPlayer,
+                       AccordionList, ErrorState, EmptyState; tabel paginasi*, dialog konfirmasi*
   components/__tests__ component test
   api/*                HTTP client (base URL, bearer token, refresh, unwrap envelope) + modul per resource
-  stores/*             pinia: auth (token, user, permissions), dll
-  composables/*        logika reusable (usePagination, usePermission)
+  api/mock/            fetch tiruan (data contoh) untuk endpoint yang belum ada di BE; hanya dev
+  stores/*             pinia: auth (token, profil, role), dll
+  composables/*        logika reusable (usePermission, useCountdown, usePlayer, useAsyncState)
   types/*              tipe response API (sinkron dengan DTO backend)
-  constants/*          OrderStatus, kode permission
+  constants/*          path API, role, konten landing, path ikon NkIcon
 e2e/                   Playwright
 ```
 
@@ -128,21 +147,24 @@ Belum ada modul fitur sebagai acuan. Acuan sementara: `src/components/FeatherIco
 - Format: Prettier (`semi: false`, `singleQuote: true`, `printWidth: 100`).
 - Import dari `src` memakai alias `@/`.
 
-- Komponen: SFC `<script setup lang="ts">`, file PascalCase (`OrderList.vue`), view
-  berakhiran `View` (`OrderDetailView.vue`), composable `useXxx.ts`, store `useXxxStore`.
+- Komponen: SFC `<script setup lang="ts">`, file PascalCase (`InvitationRenderer.vue`), view
+  berakhiran `View` (`DemoView.vue`), composable `useXxx.ts`, store `useXxxStore`.
 - Panggilan API hanya lewat `src/api/`; komponen tidak memanggil `fetch` langsung.
-- Response backend dibungkus `TransformInterceptor` nest-common: envelope
+- Response backend (Go, paket `response` go-common) berbentuk envelope
   `{ code, status, message, data, meta? }`. List paginasi: query `page` (min 1) dan
-  `limit` (1–100, default 10). TODO(verifikasi): bentuk persis `data`/`meta` list
-  (nest-common `ResultTable`: `totalItems`, `page`, `perPage`, `totalPages`).
+  `limit` (1–100, default 10); `meta`: `total`, `page`, `limit`, `total_pages`,
+  `total_results` (sesuai `src/types/api.ts`).
 - Field response snake_case (`access_token`, `created_at`) dipakai apa adanya di tipe;
   jangan dikonversi diam-diam.
-- Status order: `Draft`, `Submitted`, `Cancelled` sebagai konstanta di `src/constants/`.
-- Uang (`price`, `subtotal`, `total_amount`): tampilkan dari nilai server, format dengan
+- Nama role, status, dan konstanta domain disimpan di `src/constants/`.
+- Uang: tampilkan dari nilai server, format dengan
   `Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' })`; total tidak
   dihitung ulang dari input untuk dikirim ke server.
+- Endpoint yang belum ada di BE: modul `src/api/*` ditandai `TODO(BE)` dan dilayani
+  `src/api/mock` saat dev (`VITE_USE_MOCK_API=true`); bentuk tipe hanya draf sampai Swagger BE ada.
+  Nilai dari data (warna, teks) yang masuk ke `style` difilter, tidak ada `v-html`.
 - Teks UI berbahasa Indonesia.
-- Tampilan: ikuti skill `anthropic-skills:vuexy-html` (baca `SKILL.md`,
+- Tampilan halaman aplikasi (login, dashboard, user, role): ikuti skill `anthropic-skills:vuexy-html` (baca `SKILL.md`,
   `references/18-craft-anti-slop.md`, `19-states-a11y.md`, dan referensi komponen yang
   dipakai) untuk struktur markup, kelas, warna, ikon, dan copy. Penerjemahan ke Vue:
   - markup dan kelas Vuexy dipakai apa adanya di `<template>`; page shell
@@ -158,12 +180,17 @@ Belum ada modul fitur sebagai acuan. Acuan sementara: `src/components/FeatherIco
     (`html { font-size: 14px }`, spasi `-25/-50/-75`, warna dari 9 nama semantik);
   - script `build_page.py`/`render_check.py` dari skill tidak berlaku langsung untuk SFC;
     verifikasi visual lewat Playwright (screenshot desktop 1440 dan mobile 390).
-- Commit: Conventional Commits seperti repo backend (`feat(orders): ...`, `fix: ...`),
+- Halaman publik Niskala (landing, demo, nanti auth): kelas `nk-` dan token `--nk-*` dari
+  `src/styles/niskala.css`, grid/utilitas Bootstrap 5.1 seperlunya (titik henti 576/768/992/1200),
+  tanpa `<style>` per komponen dan tanpa hex di luar berkas itu. Selector reset memakai
+  `:where()` agar kelas `nk-` menang dari selector elemen Vuexy. Fokus keyboard terlihat,
+  `prefers-reduced-motion` dihormati, tap target minimal 44 px di layar kecil.
+- Commit: Conventional Commits seperti repo backend (`feat(landing): ...`, `fix: ...`),
   subjek huruf kecil, tanpa titik di akhir.
 
 ## Shared libraries
 
-Tidak ada. (`@yuusufyan/nest-common` hanya dipakai backend.)
+Tidak ada. (`go-common` hanya dipakai backend.)
 
 ## Data protection
 
@@ -227,8 +254,8 @@ nanti". Pemeriksaan otomatis: `node ~/.claude/agent-kit/scripts/scope-check.mjs 
 - Dependency dipin versinya dan dicek kerentanannya (`dependency audit`).
 - Konfigurasi dari env `VITE_*`; tidak ada secret di bundle frontend.
 - Setiap layar data punya state loading, kosong, error, dan sukses.
-- Tombol submit/cancel order dinonaktifkan selama request berjalan (cegah klik ganda);
-  backend tetap sumber kebenaran untuk stok dan status.
+- Tombol submit dinonaktifkan selama request berjalan (cegah klik ganda); backend tetap
+  sumber kebenaran untuk data dan status.
 
 ## Principles
 
@@ -269,7 +296,7 @@ yang tidak disentuh, kecuali diminta):
 Penegakan keamanan ada di backend; frontend hanya menyembunyikan UI dan tidak boleh
 dianggap sebagai kontrol akses.
 
-- Autentikasi: `POST /api/v1/auth/login` (`{ identifier, password }`) mengembalikan
+- Autentikasi: `POST /api/v1/auth/login` (`{ email, password }`) mengembalikan
   `{ access_token, refresh_token, token_type: 'Bearer', expires_in }`. Access token
   dikirim sebagai header `Authorization: Bearer <token>`. Refresh lewat
   `POST /auth/refresh` (`{ refresh_token }`), logout `POST /auth/logout`, profil +
@@ -278,14 +305,16 @@ dianggap sebagai kontrol akses.
 - Penyimpanan token: TODO(verifikasi). Usulan: access token di memori (store pinia),
   refresh token di `sessionStorage`; tidak memakai `localStorage`. Backend belum
   mendukung cookie httpOnly.
-- Otorisasi UI: menu, route, dan tombol ditampilkan berdasarkan `permissions` dari
-  `GET /auth/me` (kode seperti `orders.create`, `orders.submit`, `users.read`),
-  bukan nama role. Guard router mengarahkan ke login bila tidak ada sesi.
-- Isolasi pemilik: dari backend (sales hanya melihat order buatannya; order orang lain
-  → 404). Frontend menampilkan 404 sebagai "tidak ditemukan".
+- Otorisasi UI: menu, route, dan tombol ditampilkan berdasarkan role dari `GET /auth/me`
+  (saat ini hanya `SuperAdmin` yang dibedakan; `usePermission`). Guard router mengarahkan ke
+  login bila tidak ada sesi.
+- Isolasi pemilik: dari backend (data milik pengguna lain → 404). Frontend menampilkan 404 sebagai "tidak ditemukan".
 - 401: coba refresh sekali, gagal → hapus sesi dan arahkan ke login. 403: tampilkan
   pesan tidak punya akses.
-- Halaman publik (disengaja): login.
+- Halaman publik (disengaja): landing `/`, demo undangan `/demo/:slug`, dan login. Landing dan
+  demo hanya menampilkan konten pemasaran/template contoh, tanpa data pelanggan, dan tidak
+  memanggil endpoint terautentikasi (permintaan publik tanpa header Authorization). Rencana: halaman
+  Daftar `/daftar` (menunggu endpoint registrasi di BE). Dashboard lama ada di `/dashboard` (butuh sesi).
 - Field sensitif (tidak boleh di log/console/URL/storage permanen): password, token.
 - Secret: tidak ada secret di frontend. Variabel `VITE_*` masuk ke bundle dan dianggap
   publik.
@@ -293,10 +322,10 @@ dianggap sebagai kontrol akses.
 
 ## Quality ratchet
 
-Baseline scaffold (2026-11-09): lint oxlint + ESLint **0 error / 0 warning**; coverage
-**22,22% statements / 33,33% branches / 20% functions / 22,22% lines** (hanya
-`FeatherIcon` yang punya unit test; `App.vue`, router, layout, dan view 404 dicakup E2E).
-Threshold belum dipasang di `vitest.config.ts`.
+Baseline (2026-11-20, sesudah landing dan demo): lint oxlint + ESLint **0 error / 0 warning**;
+coverage **90,75% statements / 86,71% branches / 88,88% functions / 91,8% lines** (sebelum
+landing: 86,9 / 81,51 / 83,21 / 88,5). `App.vue`, `NotFoundView`, dan `VerticalLayout` sebagian
+dicakup E2E. Threshold belum dipasang di `vitest.config.ts`.
 
 - Jumlah warning lint **tidak boleh naik**; jika turun, perbarui batasnya.
 - Threshold coverage **tidak boleh turun**; jika coverage naik signifikan, naikkan.
@@ -313,9 +342,9 @@ Threshold belum dipasang di `vitest.config.ts`.
 - E2E: Playwright `e2e/*.spec.ts`. Acuan: `e2e/vue.spec.ts` (juga memeriksa font
   Montserrat terpasang). Rencana: terhadap backend sungguhan dengan DB test.
 - Wajib ada test: login gagal/berhasil, redirect ke login saat 401, refresh token,
-  menu/tombol tersembunyi tanpa permission, buat order Draft (validasi qty > 0),
-  submit dengan stok kurang (pesan error, status tetap Draft), cancel order, klik ganda
-  submit hanya mengirim satu request, dan state kosong/error di list.
+  menu/tombol tersembunyi tanpa izin, klik ganda submit hanya mengirim satu request, state
+  kosong/error/loading di setiap layar data, dan layar publik tanpa scroll horizontal di
+  390/768/1440 px.
 - ID test case dari test plan (TC-API-01, TC-E2E-01) ditulis di nama test.
 
 ## Hard rules
@@ -346,16 +375,17 @@ Threshold belum dipasang di `vitest.config.ts`.
   backend mengikuti AGENTS.md backend.
 - Jangan memakai `v-html` untuk data dari API dan jangan menaruh token di URL.
 - Jangan menambah jQuery atau library UI lain (Vuetify, PrimeVue, Tailwind, dll); UI
-  memakai kelas Vuexy. Jangan mengedit file Vuexy yang disalin di `public/vuexy/`.
+  memakai kelas Vuexy dan, untuk halaman publik Niskala, `src/styles/niskala.css`. Jangan
+  mengedit file Vuexy yang disalin di `public/vuexy/`.
 
 ## Known issues
 
-1. **Integrasi (backend):** backend tidak memanggil `enableCors`
-   (`../sales-order-nojorono/src/app.setup.ts`), jadi request browser dari origin lain
-   ditolak. Development: pakai proxy Vite `/api` → `http://localhost:3000`. Production:
-   TODO(verifikasi) (same-origin lewat reverse proxy, atau CORS dengan allowlist di BE).
-2. **Integrasi (backend):** belum ada endpoint health dan belum ada script menjalankan
-   backend dengan env test untuk E2E lintas repo.
+1. **Integrasi (backend):** BE memakai CORS dengan origin eksplisit (`CORS_ALLOWED_ORIGINS`).
+   Development: pakai proxy Vite `/api` → `http://localhost:8080`. Production:
+   TODO(verifikasi) (same-origin lewat reverse proxy, atau allowlist origin FE di BE).
+2. **Integrasi (backend):** belum ada script menjalankan backend dengan env test untuk E2E
+   lintas repo. Landing dan demo masih memakai data contoh (`src/api/mock`) karena endpoint
+   publik template belum ada di BE.
 3. **Dependency (dev, moderate):** `npm audit` melaporkan 16 temuan moderate di dev
    dependency scaffold; `npm audit --omit=dev` bersih (0). TODO(verifikasi): tinjau
    paket asalnya.

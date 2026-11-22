@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    /** Routes reachable without a session: login and the 404 catch-all. */
+    /** Routes reachable without a session: landing, demo, login, and the 404 catch-all. */
     public?: boolean
     /** Requires SuperAdmin role to access. */
     requireSuperAdmin?: boolean
@@ -17,8 +17,10 @@ export const authGuard: NavigationGuardWithThis<undefined> = async (to) => {
   const authStore = useAuthStore()
   await authStore.bootstrap()
 
-  if (to.name === 'login' && authStore.isAuthenticated) {
-    return { name: 'home' }
+  // Pengguna yang sudah masuk tidak perlu melihat Masuk/Daftar: SuperAdmin ke halaman admin
+  // yang ada, role lain ke area pelanggan.
+  if ((to.name === 'login' || to.name === 'register') && authStore.isAuthenticated) {
+    return authStore.isSuperAdmin ? { name: 'home' } : '/app'
   }
 
   if (!to.meta.public && !authStore.isAuthenticated) {
@@ -26,7 +28,7 @@ export const authGuard: NavigationGuardWithThis<undefined> = async (to) => {
   }
 
   if (to.meta.requireSuperAdmin && !authStore.isSuperAdmin) {
-    return { name: 'home' }
+    return { name: 'forbidden' }
   }
 
   return true
