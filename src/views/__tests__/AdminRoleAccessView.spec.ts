@@ -308,6 +308,22 @@ describe('AdminRoleAccessView', () => {
     denied.unmount()
   })
 
+  it('TC-UI-08: galat GET /permissions menampilkan state galat dengan coba lagi', async () => {
+    vi.mocked(listPermissions).mockReset().mockRejectedValue(new ApiError(500))
+    const wrapper = await mountView()
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Izin dan menu belum bisa dimuat')
+    wrapper.unmount()
+  })
+
+  it('TC-UI-08: galat GET /menus menampilkan state galat dengan coba lagi', async () => {
+    vi.mocked(listCatalogMenus).mockReset().mockRejectedValue(new ApiError(500))
+    const wrapper = await mountView()
+
+    expect(wrapper.find('[role="alert"]').text()).toContain('Izin dan menu belum bisa dimuat')
+    wrapper.unmount()
+  })
+
   it('TC-UI-F5-54: tautan kembali ke daftar Role dan judul dokumen', async () => {
     const wrapper = await mountView()
 

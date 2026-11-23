@@ -36,8 +36,9 @@ let roles: Role[] = [
 
 const CATALOG_MENUS = [...ADMIN_MENUS, ...APP_MENUS]
 
+// Role SuperAdmin tidak pernah punya baris di sini; GET-nya di-bypass ke seluruh katalog
+// (lihat handleRoleAccess).
 const rolePermissions = new Map<string, string[]>([
-  [MOCK_SUPERADMIN_ROLE_ID, []],
   [
     USER_ROLE_ID,
     [
@@ -56,7 +57,6 @@ const rolePermissions = new Map<string, string[]>([
 ])
 
 const roleMenus = new Map<string, string[]>([
-  [MOCK_SUPERADMIN_ROLE_ID, ADMIN_MENUS.map((m) => m.key)],
   [USER_ROLE_ID, APP_MENUS.map((m) => m.key)],
   [
     OPERATOR_ROLE_ID,
@@ -279,12 +279,19 @@ function handleRoles({ url, method, body }: MockRequest): Response | null {
   if (!UUID_PATTERN.test(id)) {
     return fail(400, 'Invalid ID')
   }
+  const kind = sub === 'permissions' || sub === 'menus' ? sub : undefined
+  if (kind && method === 'PUT') {
+    const invalid = invalidAccessBody(kind, fields)
+    if (invalid) {
+      return invalid
+    }
+  }
   const target = roles.find((r) => r.id === id)
   if (!target) {
     return fail(404, 'Role not found')
   }
-  if (sub === 'permissions' || sub === 'menus') {
-    return handleRoleAccess(target, sub, method, fields)
+  if (kind) {
+    return handleRoleAccess(target, kind, method, fields)
   }
   if (sub) {
     return null
@@ -328,6 +335,23 @@ function handleRoles({ url, method, body }: MockRequest): Response | null {
   return null
 }
 
+// Bentuk body diperiksa sebelum role dicari (AC-18: id -> bentuk body -> role ditemukan ->
+// bukan SuperAdmin -> keanggotaan katalog), jadi dipanggil terpisah dari handleRoleAccess.
+function invalidAccessBody(
+  kind: 'permissions' | 'menus',
+  fields: Record<string, unknown>,
+): Response | null {
+  const next = fields[kind]
+  if (
+    !Array.isArray(next) ||
+    next.some((v) => typeof v !== 'string') ||
+    new Set(next).size !== next.length
+  ) {
+    return fail(400, 'Invalid request body')
+  }
+  return null
+}
+
 function handleRoleAccess(
   target: Role,
   kind: 'permissions' | 'menus',
@@ -338,26 +362,21 @@ function handleRoleAccess(
   const catalog =
     kind === 'permissions' ? MOCK_PERMISSIONS.map((p) => p.code) : CATALOG_MENUS.map((m) => m.key)
   if (method === 'GET') {
-    return ok({ role_id: target.id, [kind]: store.get(target.id) ?? [] })
+    // SuperAdmin tidak punya baris pemetaan; GET-nya selalu seluruh katalog (AC-06/AC-08).
+    const granted = target.id === MOCK_SUPERADMIN_ROLE_ID ? catalog : (store.get(target.id) ?? [])
+    return ok({ role_id: target.id, [kind]: granted })
   }
   if (method !== 'PUT') {
     return null
   }
-  const next = fields[kind]
-  if (
-    !Array.isArray(next) ||
-    next.some((v) => typeof v !== 'string') ||
-    new Set(next).size !== next.length
-  ) {
-    return fail(400, 'Invalid request body')
-  }
   if (target.id === MOCK_SUPERADMIN_ROLE_ID) {
     return fail(403, protectedRoleMessage(target))
   }
-  if (next.some((v) => !catalog.includes(v as string))) {
+  const next = fields[kind] as string[]
+  if (next.some((v) => !catalog.includes(v))) {
     return fail(400, kind === 'permissions' ? 'Unknown permission code' : 'Unknown menu key')
   }
-  store.set(target.id, next as string[])
+  store.set(target.id, next)
   return ok({ role_id: target.id, [kind]: next })
 }
 

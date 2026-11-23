@@ -98,27 +98,42 @@ describe('AppShellLayout', () => {
     signIn('SuperAdmin', [
       menu('p', 'Induk', '/admin', 10),
       { ...menu('c', 'Anak', '/admin/template', 20, 'p'), icon: 'tidak-dikenal' },
+      menu('d', 'Anak lain', '/admin/membership', 30, 'p'),
     ])
     const wrapper = await mountShell(createTestRouter())
 
     expect(wrapper.findAll('.nk-sidebar__nav > ul > li')).toHaveLength(1)
-    expect(wrapper.find('.nk-sidebar__sub').text()).toBe('Anak')
+    expect(wrapper.find('.nk-sidebar__sub').text()).toBe('Anak Anak lain')
+    const children = wrapper.findAll('.nk-sidebar__sub a')
+    expect(children[0]?.attributes('aria-current')).toBe('page')
+    expect(children[1]?.attributes('aria-current')).toBeUndefined()
     wrapper.unmount()
   })
 
-  it('TC-UI-F3-42: menus kosong memakai menu cadangan sesuai peran', async () => {
+  it('TC-UI-F3-41b: menu dengan urutan sama diurutkan menurut key', async () => {
+    signIn('SuperAdmin', [
+      menu('b', 'Kedua', '/admin/membership', 10),
+      menu('a', 'Pertama', '/admin', 10),
+    ])
+    const wrapper = await mountShell(createTestRouter())
+
+    expect(wrapper.findAll('.nk-sidebar__nav > ul > li').map((li) => li.text())).toEqual([
+      'Pertama',
+      'Kedua',
+    ])
+    wrapper.unmount()
+  })
+
+  it('TC-UI-07: menus kosong dari /auth/me membuat sidebar kosong, tanpa menu cadangan', async () => {
     signIn('SuperAdmin', [])
     const admin = await mountShell(createTestRouter())
-    expect(admin.findAll('.nk-sidebar__nav a').map((a) => a.text())).toEqual([
-      'Dashboard',
-      'Pengguna & Role',
-    ])
+    expect(admin.findAll('.nk-sidebar__nav > ul > li')).toHaveLength(0)
     admin.unmount()
 
     setActivePinia(createPinia())
     signIn('User', [])
     const user = await mountShell(createTestRouter())
-    expect(user.findAll('.nk-sidebar__nav a').map((a) => a.text())).toEqual(['Beranda'])
+    expect(user.findAll('.nk-sidebar__nav > ul > li')).toHaveLength(0)
     user.unmount()
   })
 
@@ -134,9 +149,17 @@ describe('AppShellLayout', () => {
     expect(wrapper.find('.nk-app').classes()).toContain('is-menu-open')
     expect(wrapper.find('[data-testid="shell-backdrop"]').exists()).toBe(true)
 
+    await wrapper.find('.nk-app').trigger('keydown', { key: 'Tab' })
+    expect(wrapper.find('.nk-app').classes()).toContain('is-menu-open')
+
     await wrapper.find('.nk-app').trigger('keydown', { key: 'Escape' })
     expect(wrapper.find('.nk-app').classes()).not.toContain('is-menu-open')
     expect(document.activeElement).toBe(toggle.element)
+
+    await toggle.trigger('click')
+    expect(wrapper.find('.nk-app').classes()).toContain('is-menu-open')
+    await toggle.trigger('click')
+    expect(wrapper.find('.nk-app').classes()).not.toContain('is-menu-open')
 
     await toggle.trigger('click')
     await wrapper.find('[data-testid="shell-backdrop"]').trigger('click')

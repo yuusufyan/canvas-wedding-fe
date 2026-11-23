@@ -187,9 +187,6 @@ describe('mock pengguna, role, izin, dan menu', () => {
   it('TC-UI-F5-15: katalog dan set izin/menu: PUT mengganti seluruh set; SuperAdmin 403; kode tak dikenal 400', async () => {
     expect((await json(await call('/api/v1/permissions?limit=100'))).length).toBe(10)
     expect((await json(await call('/api/v1/menus?limit=100'))).length).toBe(13)
-    expect((await json(await call(`/api/v1/roles/${SUPERADMIN}/permissions`))).permissions).toEqual(
-      [],
-    )
 
     const put = (kind: string, body: unknown, id = USER) =>
       call(`/api/v1/roles/${id}/${kind}`, 'PUT', body)
@@ -205,6 +202,30 @@ describe('mock pengguna, role, izin, dan menu', () => {
     expect((await put('menus', { menus: ['tidak.ada'] })).status).toBe(400)
     expect((await put('menus', { menus: ['app.home'] })).status).toBe(200)
     expect((await put('permissions', { permissions: [] }, SUPERADMIN)).status).toBe(403)
+  })
+
+  it('TC-UI-F5-69: GET izin & menu role SuperAdmin selalu seluruh katalog (bypass, tanpa baris pemetaan)', async () => {
+    const catalogPermissions = await json(await call('/api/v1/permissions?limit=100'))
+    const catalogMenus = await json(await call('/api/v1/menus?limit=100'))
+
+    expect((await json(await call(`/api/v1/roles/${SUPERADMIN}/permissions`))).permissions).toEqual(
+      catalogPermissions.map((p: { code: string }) => p.code),
+    )
+    expect((await json(await call(`/api/v1/roles/${SUPERADMIN}/menus`))).menus).toEqual(
+      catalogMenus.map((m: { key: string }) => m.key),
+    )
+  })
+
+  it('TC-UI-F5-70: PUT izin/menu memeriksa bentuk body sebelum role ditemukan (AC-18)', async () => {
+    const missingRole = '00000000-0000-4000-8000-0000000000ff'
+    const invalidBody = { permissions: 'bukan-array' }
+
+    expect(
+      (await call(`/api/v1/roles/${missingRole}/permissions`, 'PUT', invalidBody)).status,
+    ).toBe(400)
+    expect(
+      (await call(`/api/v1/roles/${missingRole}/permissions`, 'PUT', { permissions: [] })).status,
+    ).toBe(404)
   })
 
   it('TC-UI-F5-16: dashboard mock butuh token, mode empty mengosongkan data', async () => {

@@ -56,7 +56,7 @@ describe('PublicLayout', () => {
     wrapper.unmount()
   })
 
-  it('TC-UI-F2-56: tamu melihat Masuk dan Mulai gratis; pengguna login melihat Dasbor (/admin untuk SuperAdmin, /app untuk lainnya)', () => {
+  it('TC-UI-F2-56: tamu melihat Masuk dan Mulai gratis; pengguna login melihat Dashboard (/admin untuk SuperAdmin, /app untuk lainnya)', () => {
     const guest = mountLayout()
     const links = guest.findAll('.nk-nav__actions a')
     expect(links.map((a) => a.text())).toEqual(['Masuk', 'Mulai gratis'])
@@ -66,7 +66,7 @@ describe('PublicLayout', () => {
     useAuthStore().$patch({ isAuthenticated: true })
     const member = mountLayout()
     const actions = member.findAll('.nk-nav__actions a')
-    expect(actions.map((a) => a.text())).toEqual(['Dasbor'])
+    expect(actions.map((a) => a.text())).toEqual(['Dashboard'])
     expect(actions[0]?.attributes('href')).toBe('/app')
     member.unmount()
 

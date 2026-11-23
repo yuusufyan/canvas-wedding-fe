@@ -48,6 +48,12 @@ describe('mock API admin dan auth', () => {
       'Pengguna & Role',
       'Membership',
       'Pengaturan',
+      'Beranda',
+      'Undanganku',
+      'Budget',
+      'Tamu & RSVP',
+      'Template',
+      'Pengaturan',
     ])
     expect((await post('/api/v1/auth/logout', {})).status).toBe(204)
   })

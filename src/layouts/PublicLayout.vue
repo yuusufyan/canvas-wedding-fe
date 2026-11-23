@@ -64,7 +64,7 @@ onMounted(() => {
                   class="nk-btn nk-btn--primary nk-btn--sm"
                   :to="authStore.isSuperAdmin ? { name: 'home' } : '/app'"
                 >
-                  Dasbor
+                  Dashboard
                 </RouterLink>
               </template>
               <template v-else>

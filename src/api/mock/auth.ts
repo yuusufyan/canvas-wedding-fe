@@ -54,7 +54,7 @@ const ME: MeResponse = {
   created_at: '2026-01-01T00:00:00.000Z',
   updated_at: '2026-01-01T00:00:00.000Z',
   permissions: MOCK_PERMISSIONS.map((p) => p.code),
-  menus: ADMIN_MENUS,
+  menus: [...ADMIN_MENUS, ...APP_MENUS],
 }
 
 const TOKENS: TokenResponse = {
