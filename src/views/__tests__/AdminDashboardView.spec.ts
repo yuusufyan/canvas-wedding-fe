@@ -27,7 +27,7 @@ vi.mock('@/api/memberships', () => ({
 vi.mock('@/api/templates', () => ({ getTemplateCounts: vi.fn<() => Promise<unknown>>() }))
 vi.mock('@/api/users', () => ({ listUsers: vi.fn<() => Promise<unknown>>() }))
 
-const meta = (total: number) => ({ total, page: 1, limit: 1, total_pages: 1, total_results: total })
+const meta = (total: number) => ({ total, page: 1, limit: 1, totalPages: 1, totalResults: total })
 
 function arrange() {
   vi.mocked(listUsers)

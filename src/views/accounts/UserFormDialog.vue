@@ -47,7 +47,7 @@ watch(
     email.value = props.user?.email ?? ''
     password.value = ''
     changePassword.value = false
-    isActive.value = props.user?.is_active ?? true
+    isActive.value = props.user?.isActive ?? true
     roleId.value = props.user?.role.id ?? props.roles.find((r) => r.name === ROLES.USER)?.id ?? ''
     error.value = ''
     nameError.value = ''
@@ -70,10 +70,10 @@ const patch = computed<UpdateUserRequest>(() => {
     body.email = email.value.trim()
   }
   if (!props.isSelf && roleId.value !== u.role.id) {
-    body.role_id = roleId.value
+    body.roleId = roleId.value
   }
-  if (!props.isSelf && isActive.value !== u.is_active) {
-    body.is_active = isActive.value
+  if (!props.isSelf && isActive.value !== u.isActive) {
+    body.isActive = isActive.value
   }
   if (changePassword.value && password.value) {
     body.password = password.value
@@ -99,7 +99,7 @@ function validate(): boolean {
 // 409 backend: email sudah dipakai, atau perlindungan akun sendiri / SuperAdmin aktif terakhir.
 function conflictMessage(): string {
   const body = patch.value
-  const touchesProtected = 'role_id' in body || 'is_active' in body
+  const touchesProtected = 'roleId' in body || 'isActive' in body
   const touchesEmail = 'email' in body
   if (!isEdit.value || (touchesEmail && !touchesProtected)) {
     return 'Email sudah terdaftar. Gunakan email lain.'
@@ -124,7 +124,7 @@ async function submit(): Promise<void> {
           name: name.value.trim(),
           email: email.value.trim(),
           password: password.value,
-          role_id: roleId.value,
+          roleId: roleId.value,
         })
     emit('saved', saved, props.mode)
   } catch (err) {

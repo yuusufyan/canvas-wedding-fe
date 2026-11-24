@@ -64,8 +64,8 @@ export function paginate<T>(rows: T[], url: URL, defaultLimit = 10): Response {
     total: rows.length,
     page,
     limit,
-    total_pages: Math.ceil(rows.length / limit),
-    total_results: rows.length,
+    totalPages: Math.ceil(rows.length / limit),
+    totalResults: rows.length,
   }
   return ok(rows.slice(start, start + limit), meta)
 }

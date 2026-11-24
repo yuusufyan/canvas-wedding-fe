@@ -10,11 +10,11 @@ export interface Permission {
 export type CatalogMenu = MenuItem
 
 export interface RolePermissions {
-  role_id: string
+  roleId: string
   permissions: string[]
 }
 
 export interface RoleMenus {
-  role_id: string
+  roleId: string
   menus: string[]
 }

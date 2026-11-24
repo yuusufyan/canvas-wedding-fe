@@ -12,8 +12,8 @@ export interface PaginationMeta {
   total: number
   page: number
   limit: number
-  total_pages: number
-  total_results: number
+  totalPages: number
+  totalResults: number
 }
 
 export interface PaginatedResult<T> {

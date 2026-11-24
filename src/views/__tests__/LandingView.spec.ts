@@ -29,7 +29,7 @@ describe('LandingView', () => {
     setActivePinia(createPinia())
     vi.mocked(listPublicTemplates).mockResolvedValue({
       data: mockTemplateSummaries(4),
-      meta: { total: 4, page: 1, limit: 4, total_pages: 1, total_results: 4 },
+      meta: { total: 4, page: 1, limit: 4, totalPages: 1, totalResults: 4 },
     })
   })
 

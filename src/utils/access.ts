@@ -44,6 +44,7 @@ const GROUP_TITLES: Record<string, string> = {
   guests: 'Tamu',
   budget: 'Budget',
   membership: 'Membership',
+  users: 'Pengguna & Role',
 }
 
 // Permission dikelompokkan menurut awalan kode (templates.read -> templates), urutan katalog dipertahankan.
@@ -69,9 +70,7 @@ export interface MenuGroup {
 
 // Menu dikelompokkan per area: key berawalan "admin." atau "app.".
 export function groupMenus(menus: CatalogMenu[]): MenuGroup[] {
-  const sorted = [...menus].sort(
-    (a, b) => a.sort_order - b.sort_order || a.key.localeCompare(b.key),
-  )
+  const sorted = [...menus].sort((a, b) => a.sortOrder - b.sortOrder || a.key.localeCompare(b.key))
   return [
     { key: 'admin', title: 'Area admin', items: sorted.filter((m) => m.key.startsWith('admin.')) },
     { key: 'app', title: 'Area pelanggan', items: sorted.filter((m) => m.key.startsWith('app.')) },

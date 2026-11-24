@@ -7,6 +7,8 @@ declare module 'vue-router' {
     public?: boolean
     /** Requires SuperAdmin role to access. */
     requireSuperAdmin?: boolean
+    /** Requires a specific granular permission (SuperAdmin always passes). */
+    requirePermission?: string
   }
 }
 
@@ -28,6 +30,10 @@ export const authGuard: NavigationGuardWithThis<undefined> = async (to) => {
   }
 
   if (to.meta.requireSuperAdmin && !authStore.isSuperAdmin) {
+    return { name: 'forbidden' }
+  }
+
+  if (to.meta.requirePermission && !authStore.hasPermission(to.meta.requirePermission)) {
     return { name: 'forbidden' }
   }
 

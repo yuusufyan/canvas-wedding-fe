@@ -31,7 +31,7 @@ describe('ComingSoonView', () => {
 
   it('TC-UI-F3-69: memakai label menu backend dan tautan kembali ke dasbor', async () => {
     useAuthStore().$patch({
-      menus: [{ key: 'admin.guests', label: 'Tamu', path: '/admin/tamu', sort_order: 40 }],
+      menus: [{ key: 'admin.guests', label: 'Tamu', path: '/admin/tamu', sortOrder: 40 }],
     })
     const wrapper = await mountAt('/admin/tamu')
 

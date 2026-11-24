@@ -24,12 +24,12 @@ function at(daysAgo: number): string {
 }
 
 function role(id: string, name: string, description: string, daysAgo: number): Role {
-  return { id, name, description, created_at: at(daysAgo), updated_at: at(daysAgo) }
+  return { id, name, description, createdAt: at(daysAgo), updatedAt: at(daysAgo) }
 }
 
 let roles: Role[] = [
-  role(MOCK_SUPERADMIN_ROLE_ID, 'SuperAdmin', 'Akses penuh ke seluruh sistem.', 120),
-  role(USER_ROLE_ID, 'User', 'Pelanggan: undangan, budget, tamu.', 120),
+  role(MOCK_SUPERADMIN_ROLE_ID, 'superadmin', 'Akses penuh ke seluruh sistem.', 120),
+  role(USER_ROLE_ID, 'user', 'Pelanggan: undangan, budget, tamu.', 120),
   role(OPERATOR_ROLE_ID, 'Operator', 'Mengelola template dan undangan.', 40),
   role(FINANCE_ROLE_ID, 'Keuangan', 'Memantau membership dan budget.', 30),
 ]
@@ -83,9 +83,9 @@ function user(
     name,
     email,
     role: summary(roleId),
-    is_active: active,
-    created_at: at(daysAgo),
-    updated_at: at(daysAgo),
+    isActive: active,
+    createdAt: at(daysAgo),
+    updatedAt: at(daysAgo),
   }
 }
 
@@ -109,7 +109,7 @@ const ROLE_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 function activeSuperAdmins(): User[] {
-  return users.filter((u) => u.role.id === MOCK_SUPERADMIN_ROLE_ID && u.is_active)
+  return users.filter((u) => u.role.id === MOCK_SUPERADMIN_ROLE_ID && u.isActive)
 }
 
 function isLastSuperAdmin(target: User): boolean {
@@ -138,7 +138,7 @@ function handleUsers({ url, method, body }: MockRequest): Response | null {
   if (rest === '' && method === 'POST') {
     const name = typeof fields.name === 'string' ? fields.name.trim() : ''
     const email = typeof fields.email === 'string' ? fields.email.trim().toLowerCase() : ''
-    const roleId = typeof fields.role_id === 'string' ? fields.role_id : ''
+    const roleId = typeof fields.roleId === 'string' ? fields.roleId : ''
     if (
       !name ||
       name.length > 100 ||
@@ -205,18 +205,18 @@ function patchUser(target: User, fields: Record<string, unknown>): Response {
   const keys = Object.keys(fields)
   if (
     keys.length === 0 ||
-    keys.some((k) => !['name', 'email', 'password', 'role_id', 'is_active'].includes(k))
+    keys.some((k) => !['name', 'email', 'password', 'roleId', 'isActive'].includes(k))
   ) {
     return fail(400, 'Invalid request body')
   }
   if ('password' in fields && !validPassword(fields.password)) {
     return fail(400, 'Invalid request body')
   }
-  if ('role_id' in fields && !roles.some((r) => r.id === fields.role_id)) {
+  if ('roleId' in fields && !roles.some((r) => r.id === fields.roleId)) {
     return fail(400, 'Role not found')
   }
-  const demotes = 'role_id' in fields && fields.role_id !== target.role.id
-  const deactivates = fields.is_active === false && target.is_active
+  const demotes = 'roleId' in fields && fields.roleId !== target.role.id
+  const deactivates = fields.isActive === false && target.isActive
   if ((demotes || deactivates) && (target.id === MOCK_ME_ID || isLastSuperAdmin(target))) {
     return fail(409, protectedAccountMessage(target))
   }
@@ -233,13 +233,13 @@ function patchUser(target: User, fields: Record<string, unknown>): Response {
   if (typeof fields.name === 'string' && fields.name.trim()) {
     target.name = fields.name.trim()
   }
-  if (typeof fields.role_id === 'string') {
-    target.role = summary(fields.role_id)
+  if (typeof fields.roleId === 'string') {
+    target.role = summary(fields.roleId)
   }
-  if (typeof fields.is_active === 'boolean') {
-    target.is_active = fields.is_active
+  if (typeof fields.isActive === 'boolean') {
+    target.isActive = fields.isActive
   }
-  target.updated_at = new Date().toISOString()
+  target.updatedAt = new Date().toISOString()
   return ok(target)
 }
 
@@ -312,7 +312,7 @@ function handleRoles({ url, method, body }: MockRequest): Response | null {
     if (typeof fields.description === 'string') {
       target.description = fields.description || null
     }
-    target.updated_at = new Date().toISOString()
+    target.updatedAt = new Date().toISOString()
     return ok(target)
   }
   if (method === 'DELETE') {
@@ -338,7 +338,7 @@ function handleRoleAccess(
   const catalog =
     kind === 'permissions' ? MOCK_PERMISSIONS.map((p) => p.code) : CATALOG_MENUS.map((m) => m.key)
   if (method === 'GET') {
-    return ok({ role_id: target.id, [kind]: store.get(target.id) ?? [] })
+    return ok({ roleId: target.id, [kind]: store.get(target.id) ?? [] })
   }
   if (method !== 'PUT') {
     return null
@@ -358,7 +358,7 @@ function handleRoleAccess(
     return fail(400, kind === 'permissions' ? 'Unknown permission code' : 'Unknown menu key')
   }
   store.set(target.id, next as string[])
-  return ok({ role_id: target.id, [kind]: next })
+  return ok({ roleId: target.id, [kind]: next })
 }
 
 export const handleAccounts: MockHandler = (request) => {

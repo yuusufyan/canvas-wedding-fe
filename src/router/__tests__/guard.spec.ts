@@ -15,10 +15,11 @@ function fakeRoute(
   name: string,
   isPublic: boolean,
   requireSuperAdmin?: boolean,
+  requirePermission?: string,
 ): RouteLocationNormalized {
   return {
     name,
-    meta: { public: isPublic, requireSuperAdmin },
+    meta: { public: isPublic, requireSuperAdmin, requirePermission },
   } as unknown as RouteLocationNormalized
 }
 
@@ -29,18 +30,19 @@ function mockStore(
   isAuthenticated: boolean,
   bootstrap: () => Promise<void> = () => Promise.resolve(),
   isSuperAdmin: boolean = false,
+  permissions: string[] = [],
 ) {
   vi.mocked(useAuthStore).mockReturnValue({
     isAuthenticated,
     isSuperAdmin,
+    hasPermission: (code: string) => isSuperAdmin || permissions.includes(code),
     bootstrap,
     profile: isAuthenticated
       ? {
           id: 'u-1',
           name: 'User',
           email: 'user@example.com',
-          role: { id: 'r', name: isSuperAdmin ? 'SuperAdmin' : 'User' },
-          is_active: true,
+          role: isSuperAdmin ? 'superadmin' : 'user',
         }
       : null,
   } as unknown as ReturnType<typeof useAuthStore>)
@@ -133,5 +135,18 @@ describe('authGuard', () => {
     mockStore(true, () => Promise.resolve(), true)
     expect(await runGuard(fakeRoute('users', false, true))).toBe(true)
     expect(await runGuard(fakeRoute('roles', false, true))).toBe(true)
+  })
+
+  it('checks requirePermission and lets superadmin or permission holders through', async () => {
+    mockStore(true, () => Promise.resolve(), false, [])
+    expect(await runGuard(fakeRoute('admin-users', false, false, 'users.manage'))).toEqual({
+      name: 'forbidden',
+    })
+
+    mockStore(true, () => Promise.resolve(), false, ['users.manage'])
+    expect(await runGuard(fakeRoute('admin-users', false, false, 'users.manage'))).toBe(true)
+
+    mockStore(true, () => Promise.resolve(), true, [])
+    expect(await runGuard(fakeRoute('admin-users', false, false, 'users.manage'))).toBe(true)
   })
 })

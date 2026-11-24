@@ -66,14 +66,14 @@ describe('router', () => {
     expect(redirectOf('/roles')).toEqual({ name: 'admin-roles' })
   })
 
-  it('TC-UI-F5-02: Pengguna & Role punya tiga rute SuperAdmin; halaman 403 publik', () => {
+  it('TC-UI-F5-02: Pengguna & Role punya tiga rute dengan izin users.manage; halaman 403 publik', () => {
     expect(router.resolve('/admin/pengguna').name).toBe('admin-users')
     expect(router.resolve('/admin/pengguna/role').name).toBe('admin-roles')
     const access = router.resolve('/admin/pengguna/role/abc')
     expect(access.name).toBe('admin-role-access')
     expect(access.params.id).toBe('abc')
     for (const path of ['/admin/pengguna', '/admin/pengguna/role', '/admin/pengguna/role/abc']) {
-      expect(router.resolve(path).meta.requireSuperAdmin).toBe(true)
+      expect(router.resolve(path).meta.requirePermission).toBe('users.manage')
     }
     expect(router.resolve('/403').name).toBe('forbidden')
     expect(router.resolve('/403').meta.public).toBe(true)

@@ -21,7 +21,7 @@ function menu(
   sort: number,
   parent: string | null = null,
 ): MenuItem {
-  return { key, label, path, icon: 'grid', parent_key: parent, sort_order: sort }
+  return { key, label, path, icon: 'grid', parentKey: parent, sortOrder: sort }
 }
 
 function createTestRouter(): Router {
