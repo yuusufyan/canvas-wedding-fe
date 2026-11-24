@@ -8,24 +8,24 @@ import type { Role } from '@/types/role'
 type MockResponse = Pick<Response, 'ok' | 'status'> & { json: () => Promise<unknown> }
 type FetchMock = (url: string, init?: RequestInit) => Promise<MockResponse>
 
-const meta = { total: 1, page: 1, limit: 10, total_pages: 1, total_results: 1 }
+const meta = { total: 1, page: 1, limit: 10, totalPages: 1, totalResults: 1 }
 
 const sampleUser: User = {
   id: 'u-1',
   name: 'Sales Person',
   email: 'sales@example.com',
   role: { id: 'r-1', name: 'sales' },
-  is_active: true,
-  created_at: '2026-01-01T00:00:00.000Z',
-  updated_at: '2026-01-01T00:00:00.000Z',
+  isActive: true,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 }
 
 const sampleRole: Role = {
   id: 'r-2',
   name: 'supervisor',
   description: 'Role pengawas',
-  created_at: '2026-01-01T00:00:00.000Z',
-  updated_at: '2026-01-01T00:00:00.000Z',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 }
 
 function ok(data: unknown, withMeta = false): MockResponse {
@@ -81,16 +81,16 @@ describe('user management API', () => {
       name: 'Super Admin',
       email: 'a@example.com',
       password: 'x'.repeat(12),
-      role_id: 'r-1',
+      roleId: 'r-1',
     }
     expect(await createUser(body)).toEqual(sampleUser)
     expect(lastCall(fetchMock)).toMatchObject({ method: 'POST', body })
 
     fetchMock.mockResolvedValueOnce(ok(sampleUser))
-    await updateUser('u-1', { role_id: 'r-2', is_active: false })
+    await updateUser('u-1', { roleId: 'r-2', isActive: false })
     expect(lastCall(fetchMock)).toMatchObject({
       method: 'PATCH',
-      body: { role_id: 'r-2', is_active: false },
+      body: { roleId: 'r-2', isActive: false },
     })
     expect(lastCall(fetchMock).url).toContain('/users/u-1')
 

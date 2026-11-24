@@ -165,14 +165,16 @@ describe('useAuthStore() menus dan permissions', () => {
         label: 'Template',
         path: '/admin/template',
         icon: 'layout',
-        parent_key: null,
-        sort_order: 20,
+        parentKey: null,
+        sortOrder: 20,
       },
     ]
     const store = await bootstrapWith({ ...profile, menus, permissions: ['templates.read'] })
 
     expect(store.menus).toEqual(menus)
     expect(store.permissions).toEqual(['templates.read'])
+    expect(store.hasPermission('templates.read')).toBe(true)
+    expect(store.hasPermission('users.manage')).toBe(true)
 
     vi.stubGlobal(
       'fetch',

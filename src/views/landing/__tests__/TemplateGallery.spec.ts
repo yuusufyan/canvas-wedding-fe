@@ -9,7 +9,7 @@ import type { PaginationMeta } from '@/types/api'
 
 vi.mock('@/api/publicTemplates', () => ({ listPublicTemplates: vi.fn<() => Promise<unknown>>() }))
 
-const meta: PaginationMeta = { total: 4, page: 1, limit: 4, total_pages: 1, total_results: 4 }
+const meta: PaginationMeta = { total: 4, page: 1, limit: 4, totalPages: 1, totalResults: 4 }
 
 async function mountGallery() {
   const router = createRouter({

@@ -6,22 +6,22 @@ export interface User {
   name: string
   email: string
   role: RoleSummary
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export interface CreateUserRequest {
   name: string
   email: string
   password: string
-  role_id: string
+  roleId: string
 }
 
 export interface UpdateUserRequest {
   name?: string
   email?: string
   password?: string
-  role_id?: string
-  is_active?: boolean
+  roleId?: string
+  isActive?: boolean
 }

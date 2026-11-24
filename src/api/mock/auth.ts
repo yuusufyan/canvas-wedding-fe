@@ -1,5 +1,5 @@
 import { API_BASE_PATH } from '@/constants/api'
-import { SESSION_ROLES } from '@/constants/roles'
+import { PERMISSIONS, ROLES } from '@/constants/roles'
 import type { LoginResponse, MeResponse, MenuItem, TokenResponse } from '@/types/auth'
 import { MOCK_ACCESS_TOKEN, MOCK_REFRESH_TOKEN, fail, json, ok, type MockHandler } from './http'
 
@@ -19,10 +19,11 @@ export const MOCK_PERMISSIONS = [
   ['budget.write', 'Mengelola budget'],
   ['membership.read', 'Melihat status membership'],
   ['membership.write', 'Mengelola membership'],
+  [PERMISSIONS.USERS_MANAGE, 'Mengelola pengguna, role, dan hak akses'],
 ].map(([code, description]) => ({ code: code!, description: description! }))
 
 function menu(key: string, label: string, path: string, icon: string, sortOrder: number): MenuItem {
-  return { key, label, path, icon, parent_key: null, sort_order: sortOrder }
+  return { key, label, path, icon, parentKey: null, sortOrder }
 }
 
 // Menu SuperAdmin mengikuti seed backend (auth-register-rbac, draf).
@@ -51,7 +52,7 @@ const ME: MeResponse = {
   id: MOCK_ME_ID,
   name: 'Admin Utama',
   email: MOCK_EMAIL,
-  role: SESSION_ROLES.SUPERADMIN,
+  role: ROLES.SUPERADMIN,
   permissions: MOCK_PERMISSIONS.map((p) => p.code),
   menus: ADMIN_MENUS,
 }

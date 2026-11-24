@@ -25,7 +25,7 @@ function fallbackMenu(
   icon: string,
   order: number,
 ): MenuItem {
-  return { key, label, path, icon, parent_key: null, sort_order: order }
+  return { key, label, path, icon, parentKey: null, sortOrder: order }
 }
 const FALLBACK_ADMIN_MENUS: MenuItem[] = [
   fallbackMenu('fallback.home', 'Dashboard', '/admin', 'grid', 10),
@@ -41,7 +41,7 @@ interface MenuNode {
 }
 
 function bySort(a: MenuItem, b: MenuItem): number {
-  return a.sort_order - b.sort_order || a.key.localeCompare(b.key)
+  return a.sortOrder - b.sortOrder || a.key.localeCompare(b.key)
 }
 
 const menuTree = computed<MenuNode[]>(() => {
@@ -51,10 +51,10 @@ const menuTree = computed<MenuNode[]>(() => {
       : authStore.isSuperAdmin
         ? FALLBACK_ADMIN_MENUS
         : FALLBACK_USER_MENUS
-  const parents = source.filter((m) => !m.parent_key).sort(bySort)
+  const parents = source.filter((m) => !m.parentKey).sort(bySort)
   return parents.map((item) => ({
     item,
-    children: source.filter((m) => m.parent_key === item.key).sort(bySort),
+    children: source.filter((m) => m.parentKey === item.key).sort(bySort),
   }))
 })
 

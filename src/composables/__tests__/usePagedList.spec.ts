@@ -7,7 +7,7 @@ import { usePagedList } from '../usePagedList'
 type Fetcher = (p: { q?: string; page: number; limit: number }) => Promise<PaginatedResult<string>>
 
 function result(items: string[], total = items.length): PaginatedResult<string> {
-  return { data: items, meta: { total, page: 1, limit: 2, total_pages: 1, total_results: total } }
+  return { data: items, meta: { total, page: 1, limit: 2, totalPages: 1, totalResults: total } }
 }
 
 function setup(

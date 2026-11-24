@@ -26,10 +26,10 @@ vi.mock('@/api/access', () => ({
 }))
 vi.mock('@/api/roles', () => ({ getRole: vi.fn<() => Promise<unknown>>() }))
 
-const meta = { total: 0, page: 1, limit: 100, total_pages: 1, total_results: 0 }
+const meta = { total: 0, page: 1, limit: 100, totalPages: 1, totalResults: 0 }
 
 function role(id: string, name: string): Role {
-  return { id, name, description: 'Deskripsi role', created_at: '', updated_at: '' }
+  return { id, name, description: 'Deskripsi role', createdAt: '', updatedAt: '' }
 }
 
 const PERMISSIONS = [
@@ -44,24 +44,24 @@ const MENUS = [
     label: 'Dashboard',
     path: '/admin',
     icon: 'grid',
-    parent_key: null,
-    sort_order: 10,
+    parentKey: null,
+    sortOrder: 10,
   },
   {
     key: 'admin.users',
     label: 'Pengguna & Role',
     path: '/admin/pengguna',
     icon: 'user-cog',
-    parent_key: null,
-    sort_order: 50,
+    parentKey: null,
+    sortOrder: 50,
   },
   {
     key: 'app.home',
     label: 'Beranda',
     path: '/app',
     icon: 'home',
-    parent_key: null,
-    sort_order: 10,
+    parentKey: null,
+    sortOrder: 10,
   },
 ]
 
@@ -115,16 +115,16 @@ describe('AdminRoleAccessView', () => {
     vi.mocked(listCatalogMenus).mockReset().mockResolvedValue({ data: MENUS, meta })
     vi.mocked(getRolePermissions)
       .mockReset()
-      .mockResolvedValue({ role_id: 'r-op', permissions: ['templates.read'] })
+      .mockResolvedValue({ roleId: 'r-op', permissions: ['templates.read'] })
     vi.mocked(getRoleMenus)
       .mockReset()
-      .mockResolvedValue({ role_id: 'r-op', menus: ['admin.dashboard'] })
+      .mockResolvedValue({ roleId: 'r-op', menus: ['admin.dashboard'] })
     vi.mocked(setRolePermissions)
       .mockReset()
-      .mockImplementation(async (_, permissions) => ({ role_id: 'r-op', permissions }))
+      .mockImplementation(async (_, permissions) => ({ roleId: 'r-op', permissions }))
     vi.mocked(setRoleMenus)
       .mockReset()
-      .mockImplementation(async (_, menus) => ({ role_id: 'r-op', menus }))
+      .mockImplementation(async (_, menus) => ({ roleId: 'r-op', menus }))
   })
 
   afterEach(() => {
@@ -202,7 +202,7 @@ describe('AdminRoleAccessView', () => {
   })
 
   it('TC-UI-F5-49: tombol Simpan nonaktif selama request sehingga klik ganda hanya mengirim satu request', async () => {
-    let resolve: (v: { role_id: string; permissions: string[] }) => void = () => {}
+    let resolve: (v: { roleId: string; permissions: string[] }) => void = () => {}
     vi.mocked(setRolePermissions).mockReturnValue(new Promise((r) => (resolve = r)))
     const wrapper = await mountView()
     await permBox(wrapper, 'guests.read').find('input').setValue(true)
@@ -214,7 +214,7 @@ describe('AdminRoleAccessView', () => {
     expect(save(wrapper).text()).toContain('Menyimpan…')
     expect(menuSwitch(wrapper, 'Dashboard').attributes('disabled')).toBeDefined()
 
-    resolve({ role_id: 'r-op', permissions: ['templates.read', 'guests.read'] })
+    resolve({ roleId: 'r-op', permissions: ['templates.read', 'guests.read'] })
     await flushPromises()
     expect(save(wrapper).attributes('disabled')).toBeDefined()
     wrapper.unmount()
@@ -234,7 +234,7 @@ describe('AdminRoleAccessView', () => {
     expect(lastToast()).toBeUndefined()
 
     vi.mocked(setRoleMenus).mockResolvedValue({
-      role_id: 'r-op',
+      roleId: 'r-op',
       menus: ['admin.dashboard', 'app.home'],
     })
     await save(wrapper).trigger('click')
@@ -245,8 +245,8 @@ describe('AdminRoleAccessView', () => {
   })
 
   it('TC-UI-F5-51: SuperAdmin hanya mode lihat: semua izin tercentang tapi terkunci, tanpa tombol Simpan', async () => {
-    vi.mocked(getRole).mockResolvedValue(role('r-sa', 'SuperAdmin'))
-    vi.mocked(getRolePermissions).mockResolvedValue({ role_id: 'r-sa', permissions: [] })
+    vi.mocked(getRole).mockResolvedValue(role('r-sa', 'superadmin'))
+    vi.mocked(getRolePermissions).mockResolvedValue({ roleId: 'r-sa', permissions: [] })
     const wrapper = await mountView('r-sa')
 
     expect(wrapper.find('.nk-status--brand').text()).toBe('Sistem')
@@ -266,7 +266,7 @@ describe('AdminRoleAccessView', () => {
   })
 
   it('TC-UI-F5-52: role User (sistem) boleh diatur izin dan menunya', async () => {
-    vi.mocked(getRole).mockResolvedValue(role('r-user', 'User'))
+    vi.mocked(getRole).mockResolvedValue(role('r-user', 'user'))
     const wrapper = await mountView('r-user')
 
     expect(wrapper.find('.nk-status--brand').text()).toBe('Sistem')

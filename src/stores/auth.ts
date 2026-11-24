@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { getMe, login as apiLogin, logout as apiLogout } from '@/api/auth'
 import { refreshAccessToken } from '@/api/http'
 import { clearSession, getRefreshToken } from '@/api/token'
-import { SESSION_ROLES } from '@/constants/roles'
+import { ROLES } from '@/constants/roles'
 import type { AuthUser, MeResponse, MenuItem } from '@/types/auth'
 
 // Identitas sesi persis seperti dikirim backend NestJS (`role` = nama role, huruf kecil).
@@ -17,7 +17,11 @@ export const useAuthStore = defineStore('auth', () => {
   const menus = ref<MenuItem[]>([])
   const permissions = ref<string[]>([])
 
-  const isSuperAdmin = computed(() => profile.value?.role === SESSION_ROLES.SUPERADMIN)
+  const isSuperAdmin = computed(() => profile.value?.role === ROLES.SUPERADMIN)
+
+  function hasPermission(code: string): boolean {
+    return isSuperAdmin.value || permissions.value.includes(code)
+  }
 
   // Shared across concurrent bootstrap()/guard calls so the refresh+me
   // sequence only ever runs once per app load.
@@ -98,6 +102,7 @@ export const useAuthStore = defineStore('auth', () => {
     menus,
     permissions,
     isSuperAdmin,
+    hasPermission,
     login,
     logout,
     bootstrap,

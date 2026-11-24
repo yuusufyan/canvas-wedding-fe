@@ -20,8 +20,8 @@ vi.mock('@/api/users', () => ({
 }))
 vi.mock('@/api/roles', () => ({ listRoles: vi.fn<() => Promise<unknown>>() }))
 
-const SUPERADMIN = { id: 'r-sa', name: 'SuperAdmin' }
-const USER_ROLE = { id: 'r-user', name: 'User' }
+const SUPERADMIN = { id: 'r-sa', name: 'superadmin' }
+const USER_ROLE = { id: 'r-user', name: 'user' }
 
 function user(over: Partial<User>): User {
   return {
@@ -29,9 +29,9 @@ function user(over: Partial<User>): User {
     name: 'Rina Operator',
     email: 'rina@contoh.test',
     role: USER_ROLE,
-    is_active: true,
-    created_at: '2026-11-14T00:00:00Z',
-    updated_at: '2026-11-14T00:00:00Z',
+    isActive: true,
+    createdAt: '2026-11-14T00:00:00Z',
+    updatedAt: '2026-11-14T00:00:00Z',
     ...over,
   }
 }
@@ -42,17 +42,17 @@ const INACTIVE = user({
   id: 'u-3',
   name: 'Dimas Anggara',
   email: 'dimas@contoh.test',
-  is_active: false,
+  isActive: false,
 })
 
 function page(items: User[], total = items.length): PaginatedResult<User> {
-  return { data: items, meta: { total, page: 1, limit: 10, total_pages: 1, total_results: total } }
+  return { data: items, meta: { total, page: 1, limit: 10, totalPages: 1, totalResults: total } }
 }
 
 const roles: Role[] = [
-  { id: 'r-sa', name: 'SuperAdmin', description: null, created_at: '', updated_at: '' },
-  { id: 'r-user', name: 'User', description: null, created_at: '', updated_at: '' },
-  { id: 'r-op', name: 'Operator', description: null, created_at: '', updated_at: '' },
+  { id: 'r-sa', name: 'superadmin', description: null, createdAt: '', updatedAt: '' },
+  { id: 'r-user', name: 'user', description: null, createdAt: '', updatedAt: '' },
+  { id: 'r-op', name: 'Operator', description: null, createdAt: '', updatedAt: '' },
 ]
 
 async function mountView(): Promise<VueWrapper> {
@@ -109,7 +109,7 @@ describe('AdminUsersView', () => {
       .mockReset()
       .mockResolvedValue({
         data: roles,
-        meta: { total: 3, page: 1, limit: 100, total_pages: 1, total_results: 3 },
+        meta: { total: 3, page: 1, limit: 100, totalPages: 1, totalResults: 3 },
       })
     for (const fn of [createUser, updateUser, deleteUser]) {
       ;(vi.mocked(fn) as Mock<() => Promise<unknown>>).mockReset().mockResolvedValue(OTHER)
@@ -198,7 +198,7 @@ describe('AdminUsersView', () => {
       name: 'Hilda Baru',
       email: 'hilda@contoh.test',
       password: 'Niskala2026!',
-      role_id: 'r-op',
+      roleId: 'r-op',
     })
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
     expect(lastToast()?.message).toBe('Pengguna Rina Operator ditambahkan')
@@ -243,7 +243,7 @@ describe('AdminUsersView', () => {
     await dialog().find('form').trigger('submit')
     await flushPromises()
 
-    expect(updateUser).toHaveBeenCalledWith('u-2', { name: 'Rina Baru', role_id: 'r-op' })
+    expect(updateUser).toHaveBeenCalledWith('u-2', { name: 'Rina Baru', roleId: 'r-op' })
     expect(lastToast()?.message).toBe('Perubahan disimpan')
     wrapper.unmount()
   })
@@ -306,7 +306,7 @@ describe('AdminUsersView', () => {
       .find((b) => b.text() === 'Nonaktifkan')!
       .trigger('click')
     await flushPromises()
-    expect(updateUser).toHaveBeenCalledWith('u-2', { is_active: false })
+    expect(updateUser).toHaveBeenCalledWith('u-2', { isActive: false })
     expect(lastToast()?.message).toBe('Akun Rina Operator dinonaktifkan')
 
     await openMenu(wrapper, 'Admin Utama', 'Nonaktifkan')
@@ -324,7 +324,7 @@ describe('AdminUsersView', () => {
     const wrapper = await mountView()
 
     await openMenu(wrapper, 'Dimas Anggara', 'Aktifkan')
-    expect(updateUser).toHaveBeenCalledWith('u-3', { is_active: true })
+    expect(updateUser).toHaveBeenCalledWith('u-3', { isActive: true })
     expect(lastToast()?.message).toBe('Akun Dimas Anggara diaktifkan')
 
     vi.mocked(updateUser).mockRejectedValue(new ApiError(403))
@@ -367,12 +367,12 @@ describe('AdminUsersView', () => {
   it('TC-UI-F5-35: menghapus pengguna terakhir di halaman terakhir mundur satu halaman', async () => {
     vi.mocked(listUsers).mockResolvedValueOnce({
       data: [OTHER],
-      meta: { total: 11, page: 2, limit: 10, total_pages: 2, total_results: 11 },
+      meta: { total: 11, page: 2, limit: 10, totalPages: 2, totalResults: 11 },
     })
     const wrapper = await mountView()
     vi.mocked(listUsers).mockResolvedValueOnce({
       data: [OTHER],
-      meta: { total: 11, page: 2, limit: 10, total_pages: 2, total_results: 11 },
+      meta: { total: 11, page: 2, limit: 10, totalPages: 2, totalResults: 11 },
     })
     await wrapper.find('button[aria-label="Halaman berikutnya"]').trigger('click')
     await flushPromises()

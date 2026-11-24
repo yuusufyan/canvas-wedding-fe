@@ -49,7 +49,7 @@ const ROWS = [
 ]
 
 function page(items: Membership[], total = items.length): PaginatedResult<Membership> {
-  return { data: items, meta: { total, page: 1, limit: 10, total_pages: 1, total_results: total } }
+  return { data: items, meta: { total, page: 1, limit: 10, totalPages: 1, totalResults: total } }
 }
 
 function stubWidth(wide: boolean): void {

@@ -46,7 +46,7 @@ function tpl(over: Partial<AdminTemplate>): AdminTemplate {
 function page(items: AdminTemplate[]): PaginatedResult<AdminTemplate> {
   return {
     data: items,
-    meta: { total: items.length, page: 1, limit: 12, total_pages: 1, total_results: items.length },
+    meta: { total: items.length, page: 1, limit: 12, totalPages: 1, totalResults: items.length },
   }
 }
 
@@ -386,11 +386,11 @@ describe('AdminTemplatesView', () => {
   it('TC-UI-F3-62: menghapus item terakhir di halaman terakhir mundur satu halaman', async () => {
     const second: PaginatedResult<AdminTemplate> = {
       data: [tpl({ id: 'x', name: 'Sisa' })],
-      meta: { total: 13, page: 2, limit: 12, total_pages: 2, total_results: 13 },
+      meta: { total: 13, page: 2, limit: 12, totalPages: 2, totalResults: 13 },
     }
     vi.mocked(listTemplates).mockResolvedValueOnce({
       data: ITEMS,
-      meta: { total: 13, page: 1, limit: 12, total_pages: 2, total_results: 13 },
+      meta: { total: 13, page: 1, limit: 12, totalPages: 2, totalResults: 13 },
     })
     const wrapper = await mountView()
     vi.mocked(listTemplates).mockResolvedValueOnce(second)

@@ -36,14 +36,14 @@ describe('groupPermissions dan groupMenus', () => {
     ])
   })
 
-  it('TC-UI-F5-06: menu dikelompokkan per area, urut sort_order, area kosong dibuang', () => {
+  it('TC-UI-F5-06: menu dikelompokkan per area, urut sortOrder, area kosong dibuang', () => {
     const menu = (key: string, order: number) => ({
       key,
       label: key,
       path: '/',
       icon: null,
-      parent_key: null,
-      sort_order: order,
+      parentKey: null,
+      sortOrder: order,
     })
     const groups = groupMenus([menu('app.b', 20), menu('admin.z', 5), menu('app.a', 10)])
 

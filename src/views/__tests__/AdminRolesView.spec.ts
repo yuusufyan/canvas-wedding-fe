@@ -20,19 +20,19 @@ vi.mock('@/api/roles', () => ({
 vi.mock('@/api/users', () => ({ listUsers: vi.fn<() => Promise<unknown>>() }))
 
 function role(id: string, name: string, description: string | null = null): Role {
-  return { id, name, description, created_at: '', updated_at: '' }
+  return { id, name, description, createdAt: '', updatedAt: '' }
 }
 
 const ROLES = [
-  role('r-sa', 'SuperAdmin', 'Akses penuh ke seluruh sistem.'),
-  role('r-user', 'User', 'Pelanggan.'),
+  role('r-sa', 'superadmin', 'Akses penuh ke seluruh sistem.'),
+  role('r-user', 'user', 'Pelanggan.'),
   role('r-op', 'Operator', 'Mengelola template dan undangan.'),
 ]
 
 function rolesPage(items: Role[]): PaginatedResult<Role> {
   return {
     data: items,
-    meta: { total: items.length, page: 1, limit: 10, total_pages: 1, total_results: items.length },
+    meta: { total: items.length, page: 1, limit: 10, totalPages: 1, totalResults: items.length },
   }
 }
 
@@ -42,9 +42,9 @@ function person(id: string, name: string, roleId: string): User {
     name,
     email: `${name.toLowerCase()}@contoh.test`,
     role: { id: roleId, name: roleId },
-    is_active: true,
-    created_at: '',
-    updated_at: '',
+    isActive: true,
+    createdAt: '',
+    updatedAt: '',
   }
 }
 
@@ -95,7 +95,7 @@ describe('AdminRolesView', () => {
       .mockReset()
       .mockResolvedValue({
         data: [],
-        meta: { total: 0, page: 1, limit: 100, total_pages: 0, total_results: 0 },
+        meta: { total: 0, page: 1, limit: 100, totalPages: 0, totalResults: 0 },
       })
   })
 
@@ -119,8 +119,8 @@ describe('AdminRolesView', () => {
   it('TC-UI-F5-38: role sistem tanpa ubah/hapus; SuperAdmin hanya Lihat, User dan kustom Atur izin & menu', async () => {
     const { wrapper } = await mountView()
 
-    expect(wrapper.find('button[aria-label="Aksi untuk SuperAdmin"]').exists()).toBe(false)
-    expect(wrapper.find('button[aria-label="Aksi untuk User"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Aksi untuk superadmin"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Aksi untuk user"]').exists()).toBe(false)
     expect(wrapper.find('button[aria-label="Aksi untuk Operator"]').exists()).toBe(true)
 
     const rows = wrapper.findAll('tbody tr')
@@ -253,7 +253,7 @@ describe('AdminRolesView', () => {
         person('2', 'Budi', 'r-user'),
         person('3', 'Sari', 'r-op'),
       ],
-      meta: { total: 3, page: 1, limit: 100, total_pages: 1, total_results: 3 },
+      meta: { total: 3, page: 1, limit: 100, totalPages: 1, totalResults: 3 },
     })
     const { wrapper } = await mountView()
 
@@ -280,7 +280,7 @@ describe('AdminRolesView', () => {
     vi.mocked(deleteRole).mockRejectedValue(new ApiError(409))
     vi.mocked(listUsers).mockResolvedValue({
       data: [person('1', 'Rina', 'r-op')],
-      meta: { total: 150, page: 1, limit: 100, total_pages: 2, total_results: 150 },
+      meta: { total: 150, page: 1, limit: 100, totalPages: 2, totalResults: 150 },
     })
     const { wrapper } = await mountView()
     await openMenu(wrapper, 'Operator', 'Hapus')

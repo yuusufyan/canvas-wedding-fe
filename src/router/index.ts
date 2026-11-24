@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { PERMISSIONS } from '@/constants/roles'
 import { authGuard } from './guard'
 
 const router = createRouter({
@@ -55,19 +56,19 @@ const router = createRouter({
       path: '/admin/pengguna',
       name: 'admin-users',
       component: () => import('../views/AdminUsersView.vue'),
-      meta: { requireSuperAdmin: true },
+      meta: { requirePermission: PERMISSIONS.USERS_MANAGE },
     },
     {
       path: '/admin/pengguna/role',
       name: 'admin-roles',
       component: () => import('../views/AdminRolesView.vue'),
-      meta: { requireSuperAdmin: true },
+      meta: { requirePermission: PERMISSIONS.USERS_MANAGE },
     },
     {
       path: '/admin/pengguna/role/:id',
       name: 'admin-role-access',
       component: () => import('../views/AdminRoleAccessView.vue'),
-      meta: { requireSuperAdmin: true },
+      meta: { requirePermission: PERMISSIONS.USERS_MANAGE },
     },
     { path: '/users', redirect: { name: 'admin-users' } },
     { path: '/roles', redirect: { name: 'admin-roles' } },

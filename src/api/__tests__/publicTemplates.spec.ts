@@ -13,7 +13,7 @@ function envelope(data: unknown, withMeta = false): Response {
       status: 'OK',
       message: 'OK',
       data,
-      ...(withMeta && { meta: { total: 1, page: 1, limit: 4, total_pages: 1, total_results: 1 } }),
+      ...(withMeta && { meta: { total: 1, page: 1, limit: 4, totalPages: 1, totalResults: 1 } }),
     }),
     { status: 200, headers: { 'Content-Type': 'application/json' } },
   )

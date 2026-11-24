@@ -132,13 +132,13 @@ describe('mock pengguna, role, izin, dan menu', () => {
       name: 'Baru',
       email: 'Baru@contoh.test',
       password: 'Niskala2026!',
-      role_id: USER,
+      roleId: USER,
     }
 
     expect(
       (await call(`${API_BASE_URL}/users`, 'POST', { ...valid, password: 'pendek' })).status,
     ).toBe(400)
-    expect((await call(`${API_BASE_URL}/users`, 'POST', { ...valid, role_id: 'x' })).status).toBe(
+    expect((await call(`${API_BASE_URL}/users`, 'POST', { ...valid, roleId: 'x' })).status).toBe(
       400,
     )
     expect(
@@ -152,10 +152,10 @@ describe('mock pengguna, role, izin, dan menu', () => {
   })
 
   it('TC-UI-F5-12: ubah pengguna: akun sendiri dan SuperAdmin aktif terakhir tidak bisa diturunkan atau dinonaktifkan (409)', async () => {
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { is_active: false })).status).toBe(
+    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { isActive: false })).status).toBe(
       409,
     )
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { role_id: USER })).status).toBe(409)
+    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { roleId: USER })).status).toBe(409)
     expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { name: 'Nama Baru' })).status).toBe(
       200,
     )
@@ -166,7 +166,7 @@ describe('mock pengguna, role, izin, dan menu', () => {
     expect(
       (
         await call(`${API_BASE_URL}/users/00000000-0000-4000-8000-000000000004`, 'PATCH', {
-          is_active: false,
+          isActive: false,
         })
       ).status,
     ).toBe(200)
@@ -205,7 +205,7 @@ describe('mock pengguna, role, izin, dan menu', () => {
   })
 
   it('TC-UI-F5-15: katalog dan set izin/menu: PUT mengganti seluruh set; SuperAdmin 403; kode tak dikenal 400', async () => {
-    expect((await json(await call(`${API_BASE_URL}/permissions?limit=100`))).length).toBe(10)
+    expect((await json(await call(`${API_BASE_URL}/permissions?limit=100`))).length).toBe(11)
     expect((await json(await call(`${API_BASE_URL}/menus?limit=100`))).length).toBe(13)
     expect(
       (await json(await call(`${API_BASE_URL}/roles/${SUPERADMIN}/permissions`))).permissions,
@@ -295,7 +295,7 @@ describe('mock menyerupai pesan dan data backend', () => {
     const me = (await (await call(`${API_BASE_URL}/auth/me`)).json()).data
     const catalog = (await (await call(`${API_BASE_URL}/permissions?limit=100`)).json()).data
 
-    expect(me.permissions).toHaveLength(10)
+    expect(me.permissions).toHaveLength(11)
     expect(me.permissions).toEqual(catalog.map((p: { code: string }) => p.code))
   })
 })

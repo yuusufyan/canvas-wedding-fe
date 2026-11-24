@@ -51,7 +51,7 @@ const columns: TableColumn[] = [
   { key: 'user', label: 'Pengguna', role: 'primary' },
   { key: 'role', label: 'Role', role: 'meta' },
   { key: 'status', label: 'Status', role: 'status' },
-  { key: 'created_at', label: 'Dibuat', role: 'meta' },
+  { key: 'createdAt', label: 'Dibuat', role: 'meta' },
   { key: 'actions', label: 'Aksi', role: 'action' },
 ]
 
@@ -73,7 +73,7 @@ function initial(user: User): string {
 function menuItems(user: User): ActionItem[] {
   return [
     { key: 'edit', label: 'Ubah', icon: 'edit-3' },
-    user.is_active
+    user.isActive
       ? { key: 'deactivate', label: 'Nonaktifkan', icon: 'lock', separated: true }
       : { key: 'activate', label: 'Aktifkan', icon: 'check-circle', separated: true },
     { key: 'delete', label: 'Hapus', icon: 'trash-2', danger: true },
@@ -121,7 +121,7 @@ async function runActivate(user: User): Promise<void> {
   }
   rowBusyId.value = user.id
   try {
-    await updateUser(user.id, { is_active: true })
+    await updateUser(user.id, { isActive: true })
     toast.success(`Akun ${user.name} diaktifkan`)
     await list.load()
   } catch (error) {
@@ -145,7 +145,7 @@ async function confirmDeactivate(): Promise<void> {
   dialogBusy.value = true
   dialogError.value = ''
   try {
-    await updateUser(user.id, { is_active: false })
+    await updateUser(user.id, { isActive: false })
     deactivateOpen.value = false
     toast.success(`Akun ${user.name} dinonaktifkan`)
     await list.load()
@@ -262,11 +262,11 @@ async function confirmDelete(): Promise<void> {
           </template>
           <template #cell-status="{ row }">
             <StatusBadge
-              :tone="row.is_active ? 'success' : 'neutral'"
-              :label="row.is_active ? 'Aktif' : 'Nonaktif'"
+              :tone="row.isActive ? 'success' : 'neutral'"
+              :label="row.isActive ? 'Aktif' : 'Nonaktif'"
             />
           </template>
-          <template #cell-created_at="{ row }">{{ formatDate(row.created_at) }}</template>
+          <template #cell-createdAt="{ row }">{{ formatDate(row.createdAt) }}</template>
           <template #cell-actions="{ row }">
             <ActionMenu
               :label="`Aksi untuk ${row.name}`"

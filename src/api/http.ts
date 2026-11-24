@@ -187,8 +187,8 @@ const DEFAULT_META: PaginationMeta = {
   total: 0,
   page: 1,
   limit: 10,
-  total_pages: 0,
-  total_results: 0,
+  totalPages: 0,
+  totalResults: 0,
 }
 
 export async function apiRequestPaginated<T>(
