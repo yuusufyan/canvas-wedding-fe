@@ -58,8 +58,7 @@ function signIn(role: string, menus: MenuItem[]): void {
       id: 'u1',
       name: 'Admin Utama',
       email: 'admin@contoh.test',
-      role: { id: 'r1', name: role },
-      is_active: true,
+      role: role.toLowerCase(),
     },
     menus,
   })
@@ -88,7 +87,7 @@ describe('AppShellLayout', () => {
     expect(wrapper.find('main#konten-utama .probe').text()).toBe('isi')
     expect(wrapper.find('a[aria-current="page"]').text()).toBe('Template')
     expect(wrapper.find('.nk-usermenu__trigger').text()).toContain('Admin Utama')
-    expect(wrapper.find('.nk-usermenu__trigger').text()).toContain('SuperAdmin')
+    expect(wrapper.find('.nk-usermenu__trigger').text()).toContain('superadmin')
     expect(wrapper.find('.nk-usercard').exists()).toBe(false)
     expect(document.body.classList.contains('blank-page')).toBe(false)
     wrapper.unmount()

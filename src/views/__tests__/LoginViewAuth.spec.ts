@@ -5,12 +5,13 @@ import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import LoginView from '../LoginView.vue'
 import { clearSession } from '@/api/token'
 import type { MeResponse, TokenResponse } from '@/types/auth'
+import { API_BASE_URL } from '@/constants/api'
 
 const tokens: TokenResponse = {
-  access_token: 'access-1', // secret-scan:ignore fake value
-  refresh_token: 'refresh-1', // secret-scan:ignore fake value
-  token_type: 'Bearer',
-  expires_in: 1800,
+  accessToken: 'access-1', // secret-scan:ignore fake value
+  refreshToken: 'refresh-1', // secret-scan:ignore fake value
+  tokenType: 'Bearer',
+  expiresIn: 1800,
 }
 
 function me(role: string): MeResponse {
@@ -18,10 +19,7 @@ function me(role: string): MeResponse {
     id: '1',
     name: 'Pengguna',
     email: 'pengguna@contoh.test',
-    role: { id: 'r', name: role },
-    is_active: true,
-    created_at: '2026-01-01T00:00:00Z',
-    updated_at: '2026-01-01T00:00:00Z',
+    role,
   }
 }
 
@@ -29,6 +27,14 @@ type FetchMock = (url: string, init?: RequestInit) => Promise<Response>
 
 function json(status: number, data: unknown = null): Response {
   return new Response(JSON.stringify({ code: status, status: 'ok', message: '', data }), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+// Respons sukses backend NestJS: body apa adanya, tanpa envelope.
+function raw(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
   })
@@ -74,14 +80,21 @@ describe('LoginView (auth baru)', () => {
 
   it('TC-UI-F4-20: login SuperAdmin diarahkan ke halaman admin, role lain ke /app', async () => {
     for (const [role, target] of [
-      ['SuperAdmin', '/dashboard'],
-      ['User', '/app'],
+      ['superadmin', '/dashboard'],
+      ['user', '/app'],
     ] as const) {
       setActivePinia(createPinia())
       vi.stubGlobal(
         'fetch',
         vi.fn<FetchMock>(async (url) =>
-          url === '/api/v1/auth/login' ? json(200, tokens) : json(200, me(role)),
+          url === `${API_BASE_URL}/auth/login`
+            ? raw(200, {
+                code: 200,
+                status: 'success',
+                message: '',
+                data: { ...tokens, user: me(role) },
+              })
+            : raw(200, { code: 200, status: 'success', message: '', data: me(role) }),
         ),
       )
       const router = createTestRouter()
@@ -157,7 +170,7 @@ describe('LoginView (auth baru)', () => {
   it('TC-UI-F4-25: kirim ulang memakai email yang diketik, jawaban selalu sama, lalu hitung mundur', async () => {
     vi.useFakeTimers()
     const fetchMock = vi.fn<FetchMock>(async (url) =>
-      url === '/api/v1/auth/login' ? json(403) : json(202),
+      url === `${API_BASE_URL}/auth/login` ? json(403) : json(202),
     )
     vi.stubGlobal('fetch', fetchMock)
     const wrapper = await mountLogin(createTestRouter())
@@ -169,7 +182,7 @@ describe('LoginView (auth baru)', () => {
     await flushPromises()
 
     const resendCalls = fetchMock.mock.calls.filter(
-      ([url]) => url === '/api/v1/auth/resend-verification',
+      ([url]) => url === `${API_BASE_URL}/auth/resend-verification`,
     )
     expect(resendCalls).toHaveLength(1)
     expect(JSON.parse(String(resendCalls[0]![1]!.body))).toEqual({ email: 'admin@contoh.test' })
@@ -183,7 +196,7 @@ describe('LoginView (auth baru)', () => {
 
   it('TC-UI-F4-26: kirim ulang dengan email tidak valid memfokuskan kolom email; 429 dan galat punya pesan', async () => {
     const fetchMock = vi.fn<FetchMock>(async (url) =>
-      url === '/api/v1/auth/login' ? json(403) : json(429),
+      url === `${API_BASE_URL}/auth/login` ? json(403) : json(429),
     )
     vi.stubGlobal('fetch', fetchMock)
     const wrapper = await mountLogin(createTestRouter())
@@ -192,9 +205,9 @@ describe('LoginView (auth baru)', () => {
     await wrapper.find('#login-email').setValue('rusak')
     await wrapper.find('button.nk-alert__action').trigger('click')
     expect(wrapper.text()).toContain('Format email tidak valid.')
-    expect(fetchMock.mock.calls.some(([url]) => url === '/api/v1/auth/resend-verification')).toBe(
-      false,
-    )
+    expect(
+      fetchMock.mock.calls.some(([url]) => url === `${API_BASE_URL}/auth/resend-verification`),
+    ).toBe(false)
 
     await wrapper.find('#login-email').setValue('admin@contoh.test')
     await wrapper.find('button.nk-alert__action').trigger('click')
@@ -202,7 +215,7 @@ describe('LoginView (auth baru)', () => {
     expect(wrapper.text()).toContain('Terlalu banyak permintaan')
 
     fetchMock.mockImplementation(async (url) =>
-      url === '/api/v1/auth/login' ? json(403) : json(500),
+      url === `${API_BASE_URL}/auth/login` ? json(403) : json(500),
     )
     await wrapper.find('#login-password').setValue('rahasia123')
     await wrapper.find('form').trigger('submit')

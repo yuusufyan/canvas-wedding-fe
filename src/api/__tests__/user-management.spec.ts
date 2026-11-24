@@ -52,10 +52,10 @@ describe('user management API', () => {
 
   beforeEach(() => {
     setSession({
-      access_token: 'acc-1', // secret-scan:ignore fake value
-      refresh_token: 'ref-1', // secret-scan:ignore fake value
-      token_type: 'Bearer',
-      expires_in: 1800,
+      accessToken: 'acc-1', // secret-scan:ignore fake value
+      refreshToken: 'ref-1', // secret-scan:ignore fake value
+      tokenType: 'Bearer',
+      expiresIn: 1800,
     })
     fetchMock = vi.fn<FetchMock>()
     vi.stubGlobal('fetch', fetchMock)
