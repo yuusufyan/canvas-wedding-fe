@@ -4,6 +4,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import RegisterView from '../RegisterView.vue'
 import { useSignupStore } from '@/stores/signup'
+import { API_BASE_URL } from '@/constants/api'
 
 type FetchMock = (url: string, init?: RequestInit) => Promise<Response>
 
@@ -116,7 +117,7 @@ describe('RegisterView', () => {
     await flushPromises()
 
     const [url, init] = fetchMock.mock.calls[0]!
-    expect(url).toBe('/api/v1/auth/register')
+    expect(url).toBe(`${API_BASE_URL}/auth/register`)
     expect(JSON.parse(String(init!.body))).toEqual({
       name: 'Hilda Prameswari',
       email: 'hilda@contoh.test',

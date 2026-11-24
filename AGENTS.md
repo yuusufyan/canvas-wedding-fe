@@ -7,9 +7,9 @@ memilih sendiri.
 ## Project profile
 
 Frontend platform undangan pernikahan digital "Niskala Daisy" (repo `canvas-wedding-fe`),
-terhubung ke `canvas-wedding-api` (Go Fiber v3, PostgreSQL 17, Redis 7.4). Cakupan:
-landing publik dan demo undangan, login, manajemen peran/role (`/api/v1/roles`) dan pengguna
-(`/api/v1/users`) untuk SuperAdmin. Dalam rencana bertahap
+terhubung ke `canvas-wedding-nestjs` (NestJS, PostgreSQL, Redis). Cakupan:
+landing publik dan demo undangan, login, manajemen peran/role (`/roles`) dan pengguna
+(`/users`) untuk SuperAdmin; dua yang terakhir belum ada di backend dan dilayani mock. Dalam rencana bertahap
 (`docs/features/niskala-ui/change-plan.md`): admin template/membership, area pelanggan
 (beranda, budget, tamu/RSVP), dan editor Canvas. Fitur yang endpoint-nya belum ada di backend
 dibangun terhadap klien API bertipe dengan data contoh (`src/api/mock`).
@@ -34,12 +34,16 @@ ke `canvas-wedding-api`, plus landing publik dan demo undangan (data contoh).
   Ikon: `feather-icons` 4.29 lewat `src/components/FeatherIcon.vue`; ikon yang tidak ada di
   Feather (mahkota, kilau, dll.) lewat `src/components/NkIcon.vue` (path Lucide, ISC).
 - **Database / ORM:** tidak ada (semua data lewat API backend).
-- **Layanan pendukung:** backend `canvas-wedding-api` (lihat `Workspace`).
+- **Layanan pendukung:** backend NestJS `canvas-wedding-nestjs` (lihat `Workspace`). Kontrak
+  API diambil dari folder itu saja; `canvas-wedding-api` (Go) tidak lagi jadi acuan.
 - **Arsitektur:** SPA, route di-lazy-load per view.
-- **Entry point & prefix API:** `src/main.ts`. API backend di
-  `http://localhost:8080/api/v1`; saat development diakses lewat proxy Vite `/api`
-  (`vite.config.ts`; target dari env `API_PROXY_TARGET`, default `http://localhost:8080`,
-  hanya dibaca dev server dan tidak masuk bundle). Swagger backend di `/swagger/index.html`.
+- **Entry point & URL API:** `src/main.ts`. FE memanggil backend NestJS langsung (tanpa proxy)
+  ke `VITE_API_BASE_URL` (default dev `http://localhost:3000`, dibaca di `src/config.ts`).
+  Backend tidak punya global prefix (route-nya `/auth/login`). CORS diatur di backend lewat
+  env `CORS_ORIGIN` (daftar origin FE, dipisah koma; kosong = CORS mati). Build produksi tanpa
+  `VITE_API_BASE_URL` memakai URL relatif (same-origin), jadi isi nilainya saat build.
+  Backend NestJS baru punya `/auth/{login,refresh,logout,me}` dan `/health`; endpoint lain
+  (register, verify-email, role, user, template, dst.) tetap `TODO(BE)` dan dilayani `src/api/mock`.
 
 ## Commands
 
@@ -72,11 +76,11 @@ Perintah bertanda ✓ sudah dijalankan dan lolos pada 2026-11-09.
 | Peran | Repo | Path relatif dari repo ini | AGENTS.md |
 |---|---|---|---|
 | fe | canvas-wedding-fe | . | ./AGENTS.md |
-| be | canvas-wedding-api | ../canvas-wedding-api | ../canvas-wedding-api/AGENTS.md |
+| be | canvas-wedding-nestjs | ../canvas-wedding-nestjs | ../canvas-wedding-nestjs/CLAUDE.md (bila ada) |
 
-Repo backend dibaca dari path relatif di atas. Kontrak API diambil dari Swagger backend dan
-`../canvas-wedding-api/README.md` serta DTO di `internal/dto/`. Perubahan kode backend
-dikerjakan di repo backend mengikuti AGENTS.md backend.
+Repo backend dibaca dari path relatif di atas. Kontrak API diambil dari controller, DTO, dan
+`src/common/` di `../canvas-wedding-nestjs/src/`. Perubahan kode backend dikerjakan di repo
+backend mengikuti aturannya.
 
 ## Test environment
 
@@ -90,14 +94,14 @@ sungguhan belum ada; usulan minimal:
   port 6380, dari `docker-compose.test.yml`), migration ke DB test, lalu backend
   dijalankan dengan `test/test.env` (nilai palsu). TODO(verifikasi): BE belum punya
   script "start dengan env test" untuk E2E lintas repo.
-- Backend untuk test: base URL `http://localhost:8080/api/v1` (proxy dev `/api`); BE
+- Backend untuk test: base URL `http://localhost:3000` (`VITE_API_BASE_URL`); BE
   punya `GET /health`. TODO(verifikasi): script menjalankan BE dengan env test untuk E2E lintas repo.
-- Frontend untuk E2E: `npm run dev` (Vite, default `http://localhost:5173`) dengan proxy
-  Vite `/api` → backend (lihat Known issue 1).
+- Frontend untuk E2E: `npm run dev` (Vite, default `http://localhost:5173`) memanggil
+  backend langsung; `CORS_ORIGIN` backend harus berisi `http://localhost:5173`.
 - File env test: usulan `e2e/e2e.env` (nilai palsu: base URL, username/password user test).
   Variabel yang terbaca di browser wajib berawalan `VITE_` dan tidak boleh berisi secret.
 - Identitas test per role: SuperAdmin dibuat lewat CLI bootstrap BE (`make bootstrap-superadmin`);
-  token lewat `POST /api/v1/auth/login` (`{ email, password }`). Data test memakai domain
+  token lewat `POST /auth/login` (`{ email, password }`). Data test memakai domain
   `contoh.test`; password test palsu ada di env test BE.
 - Data seed test: hanya role `SuperAdmin` dari migration BE; data template/undangan fiktif
   datang dari mock FE sampai endpoint-nya ada.
@@ -150,12 +154,16 @@ Belum ada modul fitur sebagai acuan. Acuan sementara: `src/components/FeatherIco
 - Komponen: SFC `<script setup lang="ts">`, file PascalCase (`InvitationRenderer.vue`), view
   berakhiran `View` (`DemoView.vue`), composable `useXxx.ts`, store `useXxxStore`.
 - Panggilan API hanya lewat `src/api/`; komponen tidak memanggil `fetch` langsung.
-- Response backend (Go, paket `response` go-common) berbentuk envelope
-  `{ code, status, message, data, meta? }`. List paginasi: query `page` (min 1) dan
-  `limit` (1–100, default 10); `meta`: `total`, `page`, `limit`, `total_pages`,
-  `total_results` (sesuai `src/types/api.ts`).
-- Field response snake_case (`access_token`, `created_at`) dipakai apa adanya di tipe;
-  jangan dikonversi diam-diam.
+- Backend NestJS memakai envelope nest-common untuk semua respons:
+  `{ code, status, message, data, meta? }` (error: `status: 'error'`). `apiRequest` membuka
+  `data`; `meta` paginasi snake_case (`total_pages`, `total_results`), lihat `src/types/api.ts`.
+  Isi `data` camelCase (`accessToken`, `refreshToken`, `expiresIn`). 204 tanpa body.
+- Endpoint `TODO(BE)` yang dilayani mock memakai envelope yang sama. List paginasi: query
+  `page` (min 1) dan `limit` (1–100, default 10). Saat backend menambah endpoint-nya, samakan
+  tipenya dengan isi `data` dari BE.
+- Field response dipakai apa adanya di tipe; jangan dikonversi diam-diam.
+- `role` di sesi login (`/auth/login`, `/auth/me`) berupa string huruf kecil (`'superadmin'`,
+  konstanta `SESSION_ROLES`), bukan objek `{ id, name }`.
 - Nama role, status, dan konstanta domain disimpan di `src/constants/`.
 - Uang: tampilkan dari nilai server, format dengan
   `Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' })`; total tidak
@@ -296,12 +304,12 @@ yang tidak disentuh, kecuali diminta):
 Penegakan keamanan ada di backend; frontend hanya menyembunyikan UI dan tidak boleh
 dianggap sebagai kontrol akses.
 
-- Autentikasi: `POST /api/v1/auth/login` (`{ email, password }`) mengembalikan
-  `{ access_token, refresh_token, token_type: 'Bearer', expires_in }`. Access token
+- Autentikasi: `POST /auth/login` (`{ email, password }`) mengembalikan
+  `{ accessToken, refreshToken, tokenType: 'Bearer', expiresIn, user }`. Access token
   dikirim sebagai header `Authorization: Bearer <token>`. Refresh lewat
-  `POST /auth/refresh` (`{ refresh_token }`), logout `POST /auth/logout`, profil +
-  permission `GET /auth/me`. Default backend: access 30 menit, refresh 1 jam, sesi
-  absolut 8 jam.
+  `POST /auth/refresh` (`{ refreshToken }`), logout `POST /auth/logout`, profil
+  `GET /auth/me`. Default backend: access 15 menit, refresh 7 hari (sliding), sesi
+  absolut 30 hari.
 - Penyimpanan token: TODO(verifikasi). Usulan: access token di memori (store pinia),
   refresh token di `sessionStorage`; tidak memakai `localStorage`. Backend belum
   mendukung cookie httpOnly.
@@ -380,9 +388,9 @@ dicakup E2E. Threshold belum dipasang di `vitest.config.ts`.
 
 ## Known issues
 
-1. **Integrasi (backend):** BE memakai CORS dengan origin eksplisit (`CORS_ALLOWED_ORIGINS`).
-   Development: pakai proxy Vite `/api` → `http://localhost:8080`. Production:
-   TODO(verifikasi) (same-origin lewat reverse proxy, atau allowlist origin FE di BE).
+1. **Integrasi (backend):** BE memakai CORS dengan origin eksplisit (`CORS_ORIGIN`, dipisah
+   koma). FE memanggil BE langsung. Production: isi `VITE_API_BASE_URL` saat build dan daftarkan
+   origin FE di `CORS_ORIGIN` BE (TODO(verifikasi) di lingkungan deploy).
 2. **Integrasi (backend):** belum ada script menjalankan backend dengan env test untuk E2E
    lintas repo. Landing dan demo masih memakai data contoh (`src/api/mock`) karena endpoint
    publik template belum ada di BE.

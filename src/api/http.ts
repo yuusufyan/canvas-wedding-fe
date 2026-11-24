@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from '@/constants/api'
+import { API_BASE_URL } from '@/constants/api'
 import type { ApiEnvelope, PaginatedResult, PaginationMeta } from '@/types/api'
 import type { TokenResponse } from '@/types/auth'
 import { clearSession, getAccessToken, getRefreshToken, setSession } from './token'
@@ -52,11 +52,13 @@ function isAbsoluteUrl(path: string): boolean {
   return /^[a-z][a-z\d+.-]*:/i.test(path) || path.startsWith('//')
 }
 
-async function sendEnvelopeRequest<T>(
+// Mengembalikan body JSON apa adanya (null untuk 204). Pembungkusan envelope ada di
+// requestEnvelope: backend NestJS memakai envelope nest-common { code, status, message, data, meta? }.
+async function sendRequest(
   url: string,
   init: ApiRequestInit,
   accessToken: string | null,
-): Promise<ApiEnvelope<T>> {
+): Promise<unknown> {
   const headers: Record<string, string> = {}
   if (init.body !== undefined) {
     headers['Content-Type'] = 'application/json'
@@ -81,10 +83,10 @@ async function sendEnvelopeRequest<T>(
   }
 
   if (response.status === 204) {
-    return { code: 204, status: 'OK', message: '', data: null as T }
+    return null
   }
 
-  return (await response.json()) as ApiEnvelope<T>
+  return (await response.json()) as unknown
 }
 
 function handleUnrecoverable401(init: ApiRequestInit): void {
@@ -94,12 +96,9 @@ function handleUnrecoverable401(init: ApiRequestInit): void {
   }
 }
 
-async function retryEnvelopeWithCurrentToken<T>(
-  url: string,
-  init: ApiRequestInit,
-): Promise<ApiEnvelope<T>> {
+async function retryWithCurrentToken(url: string, init: ApiRequestInit): Promise<unknown> {
   try {
-    return await sendEnvelopeRequest<T>(url, init, getAccessToken())
+    return await sendRequest(url, init, getAccessToken())
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       handleUnrecoverable401(init)
@@ -130,7 +129,7 @@ async function performRefresh(): Promise<boolean> {
   try {
     const tokens = await apiRequest<TokenResponse>('/auth/refresh', {
       method: 'POST',
-      body: { refresh_token: refreshToken },
+      body: { refreshToken },
       skipAuth: true,
       skipRetry: true,
     })
@@ -142,14 +141,14 @@ async function performRefresh(): Promise<boolean> {
   }
 }
 
-async function requestEnvelope<T>(path: string, init: ApiRequestInit): Promise<ApiEnvelope<T>> {
+async function requestBody(path: string, init: ApiRequestInit): Promise<unknown> {
   const absolute = isAbsoluteUrl(path)
-  const url = absolute ? path : `${API_BASE_PATH}${path}`
+  const url = absolute ? path : `${API_BASE_URL}${path}`
   const addAuth = !absolute && !init.skipAuth
   const tokenForRequest = addAuth ? getAccessToken() : null
 
   try {
-    return await sendEnvelopeRequest<T>(url, init, tokenForRequest)
+    return await sendRequest(url, init, tokenForRequest)
   } catch (error) {
     if (!(error instanceof ApiError) || error.status !== 401 || init.skipRetry || !addAuth) {
       throw error
@@ -158,7 +157,7 @@ async function requestEnvelope<T>(path: string, init: ApiRequestInit): Promise<A
     // A concurrent request already refreshed the token for us: replay with
     // the current token instead of starting a second refresh (SR-03).
     if (getAccessToken() !== tokenForRequest && getAccessToken() !== null) {
-      return retryEnvelopeWithCurrentToken<T>(url, init)
+      return retryWithCurrentToken(url, init)
     }
 
     const refreshed = await refreshAccessToken()
@@ -167,8 +166,16 @@ async function requestEnvelope<T>(path: string, init: ApiRequestInit): Promise<A
       throw error
     }
 
-    return retryEnvelopeWithCurrentToken<T>(url, init)
+    return retryWithCurrentToken(url, init)
   }
+}
+
+async function requestEnvelope<T>(path: string, init: ApiRequestInit): Promise<ApiEnvelope<T>> {
+  const body = await requestBody(path, init)
+  if (body === null) {
+    return { code: 204, status: 'OK', message: '', data: null as T }
+  }
+  return body as ApiEnvelope<T>
 }
 
 export async function apiRequest<T>(path: string, init: ApiRequestInit): Promise<T> {

@@ -13,7 +13,7 @@ const trigger = ref<HTMLButtonElement | null>(null)
 const menuId = useId()
 
 const name = computed(() => authStore.profile?.name ?? '')
-const roleName = computed(() => authStore.profile?.role.name ?? '')
+const roleName = computed(() => authStore.profile?.role ?? '')
 const initial = computed(() => name.value.charAt(0).toUpperCase())
 
 function close(returnFocus = false): void {

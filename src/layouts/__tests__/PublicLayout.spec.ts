@@ -77,8 +77,7 @@ describe('PublicLayout', () => {
         id: 'a',
         name: 'Admin',
         email: 'admin@contoh.test',
-        role: { id: 'r', name: 'SuperAdmin' },
-        is_active: true,
+        role: 'superadmin',
       },
     })
     const admin = mountLayout()

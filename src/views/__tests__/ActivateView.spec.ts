@@ -3,6 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import ActivateView from '../ActivateView.vue'
+import { API_BASE_URL } from '@/constants/api'
 
 type FetchMock = (url: string, init?: RequestInit) => Promise<Response>
 
@@ -57,7 +58,7 @@ describe('ActivateView', () => {
     expect(urlAtRequest).not.toContain('token')
     expect(window.location.hash).toBe('')
     const [url, init] = fetchMock.mock.calls[0]!
-    expect(url).toBe('/api/v1/auth/verify-email')
+    expect(url).toBe(`${API_BASE_URL}/auth/verify-email`)
     expect(init!.method).toBe('POST')
     expect(JSON.parse(String(init!.body))).toEqual({ token: TOKEN })
     expect(wrapper.find('h1').text()).toBe('Akunmu sudah aktif')
@@ -147,7 +148,7 @@ describe('ActivateView', () => {
   it('TC-UI-F4-48: kirim tautan baru: validasi email, jawaban generik, dan hitung mundur 60 detik', async () => {
     vi.useFakeTimers()
     const fetchMock = vi.fn<FetchMock>(async (url) =>
-      url === '/api/v1/auth/verify-email' ? respond(400) : respond(202),
+      url === `${API_BASE_URL}/auth/verify-email` ? respond(400) : respond(202),
     )
     vi.stubGlobal('fetch', fetchMock)
     const wrapper = await mountPage('')
@@ -162,7 +163,9 @@ describe('ActivateView', () => {
     await wrapper.find('form').trigger('submit')
     await flushPromises()
 
-    const resend = fetchMock.mock.calls.filter(([u]) => u === '/api/v1/auth/resend-verification')
+    const resend = fetchMock.mock.calls.filter(
+      ([u]) => u === `${API_BASE_URL}/auth/resend-verification`,
+    )
     expect(resend).toHaveLength(1)
     expect(JSON.parse(String(resend[0]![1]!.body))).toEqual({ email: 'hilda@contoh.test' })
     expect(wrapper.find('[role="status"]').text()).toContain('Jika akunmu perlu diaktifkan')
@@ -175,7 +178,7 @@ describe('ActivateView', () => {
 
   it('TC-UI-F4-49: kirim tautan baru gagal (429 atau galat) menampilkan pesan generik', async () => {
     const fetchMock = vi.fn<FetchMock>(async (url) =>
-      url === '/api/v1/auth/verify-email' ? respond(400) : respond(429),
+      url === `${API_BASE_URL}/auth/verify-email` ? respond(400) : respond(429),
     )
     vi.stubGlobal('fetch', fetchMock)
     const wrapper = await mountPage('')
@@ -187,7 +190,7 @@ describe('ActivateView', () => {
     expect(wrapper.find('[role="alert"]').text()).toContain('Terlalu banyak permintaan')
 
     fetchMock.mockImplementation(async (url) =>
-      url === '/api/v1/auth/verify-email' ? respond(400) : respond(500),
+      url === `${API_BASE_URL}/auth/verify-email` ? respond(400) : respond(500),
     )
     await wrapper.find('form').trigger('submit')
     await flushPromises()

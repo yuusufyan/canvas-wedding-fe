@@ -11,6 +11,7 @@ import {
 } from '../templates'
 import { getMembershipSummary, listMemberships } from '../memberships'
 import { clearSession, setSession } from '../token'
+import { API_BASE_URL } from '@/constants/api'
 
 function envelope(data: unknown, meta = false): Response {
   return new Response(
@@ -41,7 +42,7 @@ describe('API admin template dan membership', () => {
   beforeEach(() => {
     fetchMock = vi.fn<typeof fetch>()
     vi.stubGlobal('fetch', fetchMock)
-    setSession({ access_token: 'tok', refresh_token: 'ref', token_type: 'Bearer', expires_in: 60 }) // secret-scan:ignore nilai palsu
+    setSession({ accessToken: 'tok', refreshToken: 'ref', tokenType: 'Bearer', expiresIn: 60 }) // secret-scan:ignore nilai palsu
   })
 
   afterEach(() => {
@@ -60,7 +61,9 @@ describe('API admin template dan membership', () => {
     await listTemplates({ page: 2, limit: 12, status: 'Draft', access: 'Premium', q: 'rustic' })
 
     const [url, init] = lastCall()
-    expect(url).toBe('/api/v1/templates?page=2&limit=12&status=Draft&access=Premium&q=rustic')
+    expect(url).toBe(
+      `${API_BASE_URL}/templates?page=2&limit=12&status=Draft&access=Premium&q=rustic`,
+    )
     expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok')
   })
 
@@ -68,20 +71,20 @@ describe('API admin template dan membership', () => {
     fetchMock.mockImplementation(async () => envelope({ id: 'a/b' }))
 
     await getTemplateCounts()
-    expect(lastCall()[0]).toBe('/api/v1/templates/counts')
+    expect(lastCall()[0]).toBe(`${API_BASE_URL}/templates/counts`)
 
     await createTemplate({ name: 'Baru', access: 'Gratis' })
     expect(lastCall()[1].method).toBe('POST')
     expect(JSON.parse(String(lastCall()[1].body))).toEqual({ name: 'Baru', access: 'Gratis' })
 
     await updateTemplate('a/b', { access: 'Premium' })
-    expect(lastCall()[0]).toBe('/api/v1/templates/a%2Fb')
+    expect(lastCall()[0]).toBe(`${API_BASE_URL}/templates/a%2Fb`)
     expect(lastCall()[1].method).toBe('PATCH')
 
     await publishTemplate('x')
-    expect(lastCall()[0]).toBe('/api/v1/templates/x/publish')
+    expect(lastCall()[0]).toBe(`${API_BASE_URL}/templates/x/publish`)
     await archiveTemplate('x')
-    expect(lastCall()[0]).toBe('/api/v1/templates/x/archive')
+    expect(lastCall()[0]).toBe(`${API_BASE_URL}/templates/x/archive`)
 
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }))
     await deleteTemplate('x')
@@ -91,10 +94,10 @@ describe('API admin template dan membership', () => {
   it('TC-UI-F3-10: membership: daftar berpaginasi dan ringkasan', async () => {
     fetchMock.mockResolvedValue(envelope([], true))
     await listMemberships({ page: 1, limit: 10, status: 'Aktif', q: 'nadia' })
-    expect(lastCall()[0]).toBe('/api/v1/memberships?page=1&limit=10&status=Aktif&q=nadia')
+    expect(lastCall()[0]).toBe(`${API_BASE_URL}/memberships?page=1&limit=10&status=Aktif&q=nadia`)
 
     fetchMock.mockResolvedValue(envelope({ total: 1 }))
     await getMembershipSummary()
-    expect(lastCall()[0]).toBe('/api/v1/memberships/summary')
+    expect(lastCall()[0]).toBe(`${API_BASE_URL}/memberships/summary`)
   })
 })

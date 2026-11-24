@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import { ROLES } from '@/constants/roles'
+import { SESSION_ROLES } from '@/constants/roles'
 import { useAuthStore } from '@/stores/auth'
 import { usePermission } from '../usePermission'
 
@@ -22,8 +22,7 @@ describe('usePermission', () => {
         id: 'u1',
         name: 'Staff Member',
         email: 'staff@example.com',
-        role: { id: 'r1', name: 'Staff' },
-        is_active: true,
+        role: 'staff',
       },
     })
     expect(isSuperAdmin.value).toBe(false)
@@ -39,8 +38,7 @@ describe('usePermission', () => {
         id: 'u2',
         name: 'Super Admin',
         email: 'superadmin@example.com',
-        role: { id: 'r2', name: ROLES.SUPERADMIN },
-        is_active: true,
+        role: SESSION_ROLES.SUPERADMIN,
       },
     })
     const { isSuperAdmin, canManageUsers, canManageRoles } = usePermission()

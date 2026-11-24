@@ -20,12 +20,32 @@ export interface ResendVerificationRequest {
   email: string
 }
 
-// `data` shape shared by POST /auth/login and POST /auth/refresh.
+// Body respons POST /auth/login dan POST /auth/refresh di backend NestJS (isi `data` pada envelope),
+// field camelCase (`expiresIn` = umur access token dalam detik).
 export interface TokenResponse {
-  access_token: string
-  refresh_token: string
-  token_type: string
-  expires_in: number
+  accessToken: string
+  refreshToken: string
+  tokenType: 'Bearer'
+  expiresIn: number
+}
+
+// Identitas user dari backend NestJS (login dan GET /auth/me). `role` adalah nama role
+// (string huruf kecil, mis. 'superadmin'), bukan objek.
+export interface AuthUser {
+  id: string
+  email: string
+  name: string
+  role: string
+}
+
+// Body respons POST /auth/login.
+export interface LoginResponse extends TokenResponse {
+  user: AuthUser
+}
+
+// Body untuk POST /auth/refresh dan POST /auth/logout.
+export interface RefreshTokenRequest {
+  refreshToken: string
 }
 
 // `role` summary inside user / auth profile.
@@ -45,16 +65,9 @@ export interface MenuItem {
   sort_order: number
 }
 
-// `data` shape for GET /auth/me and user response. permissions dan menus ditambahkan
-// backend (additive); opsional sampai endpoint-nya aktif.
-export interface MeResponse {
-  id: string
-  name: string
-  email: string
-  role: RoleSummary
-  is_active: boolean
-  created_at: string
-  updated_at: string
+// Body respons GET /auth/me di backend NestJS (isi `data` pada envelope). `permissions` dan `menus`
+// belum dikirim backend NestJS (TODO(BE)); opsional sampai ada, sidebar memakai menu cadangan.
+export interface MeResponse extends AuthUser {
   permissions?: string[]
   menus?: MenuItem[]
 }

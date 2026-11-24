@@ -8,19 +8,20 @@ import {
 } from '../http'
 import { clearSession, getAccessToken, getRefreshToken, setSession } from '../token'
 import type { TokenResponse } from '@/types/auth'
+import { API_BASE_URL } from '@/constants/api'
 
 const oldTokens: TokenResponse = {
-  access_token: 'old-token', // secret-scan:ignore fake value
-  refresh_token: 'refresh-old', // secret-scan:ignore fake value
-  token_type: 'Bearer',
-  expires_in: 1800,
+  accessToken: 'old-token', // secret-scan:ignore fake value
+  refreshToken: 'refresh-old', // secret-scan:ignore fake value
+  tokenType: 'Bearer',
+  expiresIn: 1800,
 }
 
 const newTokens: TokenResponse = {
-  access_token: 'new-token', // secret-scan:ignore fake value
-  refresh_token: 'refresh-new', // secret-scan:ignore fake value
-  token_type: 'Bearer',
-  expires_in: 1800,
+  accessToken: 'new-token', // secret-scan:ignore fake value
+  refreshToken: 'refresh-new', // secret-scan:ignore fake value
+  tokenType: 'Bearer',
+  expiresIn: 1800,
 }
 
 type MockResponse = Pick<Response, 'ok' | 'status'> & { json: () => Promise<unknown> }
@@ -49,7 +50,7 @@ afterEach(() => {
 })
 
 describe('apiRequest', () => {
-  it('TC-UNIT-01: attaches Authorization only to relative paths under the base API', async () => {
+  it('TC-UNIT-01: attaches Authorization only to paths built from the API base URL, never to other absolute URLs', async () => {
     setSession(oldTokens)
     const fetchMock = vi.fn<FetchMock>(async (_url, _init) => jsonResponse(200, { ok: true }))
     vi.stubGlobal('fetch', fetchMock)
@@ -62,7 +63,7 @@ describe('apiRequest', () => {
     if (!firstCall || !secondCall) {
       throw new Error('expected exactly two fetch calls')
     }
-    expect(firstCall[0]).toBe('/api/v1/auth/me')
+    expect(firstCall[0]).toBe(`${API_BASE_URL}/auth/me`)
     expect(authHeader(firstCall[1])).toBe('Bearer old-token')
     expect(secondCall[0]).toBe('https://other-origin.example/resource')
     expect(authHeader(secondCall[1])).toBeUndefined()
@@ -72,7 +73,7 @@ describe('apiRequest', () => {
     setSession(oldTokens)
     let refreshCalls = 0
     const fetchMock = vi.fn<FetchMock>(async (url, init) => {
-      if (url === '/api/v1/auth/refresh') {
+      if (url === `${API_BASE_URL}/auth/refresh`) {
         refreshCalls += 1
         return jsonResponse(200, newTokens)
       }
@@ -90,7 +91,11 @@ describe('apiRequest', () => {
     ])
 
     expect(refreshCalls).toBe(1)
-    expect(results).toEqual([{ url: '/api/v1/a' }, { url: '/api/v1/b' }, { url: '/api/v1/c' }])
+    expect(results).toEqual([
+      { url: `${API_BASE_URL}/a` },
+      { url: `${API_BASE_URL}/b` },
+      { url: `${API_BASE_URL}/c` },
+    ])
     expect(getAccessToken()).toBe('new-token')
   })
 
@@ -98,7 +103,7 @@ describe('apiRequest', () => {
     setSession(oldTokens)
     let refreshCalls = 0
     const fetchMock = vi.fn<FetchMock>(async (url, init) => {
-      if (url === '/api/v1/auth/refresh') {
+      if (url === `${API_BASE_URL}/auth/refresh`) {
         refreshCalls += 1
         return jsonResponse(200, newTokens)
       }
@@ -122,12 +127,12 @@ describe('apiRequest', () => {
     setSession(oldTokens)
     const consumedRefreshTokens = new Set<string>()
     const fetchMock = vi.fn<FetchMock>(async (url, init) => {
-      if (url === '/api/v1/auth/refresh') {
-        const body = JSON.parse(init?.body as string) as { refresh_token: string }
-        if (consumedRefreshTokens.has(body.refresh_token)) {
+      if (url === `${API_BASE_URL}/auth/refresh`) {
+        const body = JSON.parse(init?.body as string) as { refreshToken: string }
+        if (consumedRefreshTokens.has(body.refreshToken)) {
           return jsonResponse(401, null)
         }
-        consumedRefreshTokens.add(body.refresh_token)
+        consumedRefreshTokens.add(body.refreshToken)
         return jsonResponse(200, newTokens)
       }
       if (authHeader(init) === 'Bearer old-token') {
@@ -143,7 +148,7 @@ describe('apiRequest', () => {
     expect(getRefreshToken()).toBe('refresh-new')
     const staleRefreshCall = await apiRequest<TokenResponse>('/auth/refresh', {
       method: 'POST',
-      body: { refresh_token: 'refresh-old' },
+      body: { refreshToken: 'refresh-old' },
       skipAuth: true,
       skipRetry: true,
     }).catch((error: unknown) => error)
@@ -156,7 +161,7 @@ describe('apiRequest', () => {
     setSessionExpiredCallback(expiredCallback)
     let refreshCalls = 0
     const fetchMock = vi.fn<FetchMock>(async (url) => {
-      if (url === '/api/v1/auth/refresh') {
+      if (url === `${API_BASE_URL}/auth/refresh`) {
         refreshCalls += 1
         return jsonResponse(401, null)
       }
@@ -176,11 +181,11 @@ describe('apiRequest', () => {
     setSession(oldTokens)
     let refreshCalls = 0
     const fetchMock = vi.fn<FetchMock>(async (url) => {
-      if (url === '/api/v1/auth/refresh') {
+      if (url === `${API_BASE_URL}/auth/refresh`) {
         refreshCalls += 1
         return jsonResponse(401, null)
       }
-      if (url === '/api/v1/auth/login') {
+      if (url === `${API_BASE_URL}/auth/login`) {
         return jsonResponse(401, null)
       }
       return jsonResponse(200, { ok: true })
@@ -200,6 +205,17 @@ describe('apiRequest', () => {
     const refreshed = await refreshAccessToken()
     expect(refreshed).toBe(false)
     expect(refreshCalls).toBe(1)
+  })
+
+  it('respons 204 mengembalikan null', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<FetchMock>(async () => ({ ok: true, status: 204, json: async () => null })),
+    )
+
+    const result = await apiRequest<null>('/auth/logout', { method: 'POST', body: {} })
+
+    expect(result).toBeNull()
   })
 
   it('TC-UI-F5-61: daftar tanpa key data (omitempty) menjadi array kosong dengan meta bawaan', async () => {

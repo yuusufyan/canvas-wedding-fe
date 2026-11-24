@@ -83,8 +83,7 @@ describe('UserMenu', () => {
         id: 'u1',
         name: 'Admin Utama',
         email: 'admin@contoh.test',
-        role: { id: 'r', name: 'SuperAdmin' },
-        is_active: true,
+        role: 'superadmin',
       },
     })
   })
@@ -93,7 +92,7 @@ describe('UserMenu', () => {
     const wrapper = mount(UserMenu, { attachTo: document.body })
     const trigger = wrapper.find('.nk-usermenu__trigger')
     expect(trigger.text()).toContain('Admin Utama')
-    expect(trigger.text()).toContain('SuperAdmin')
+    expect(trigger.text()).toContain('superadmin')
     expect(trigger.attributes('aria-label')).toBe('Menu akun Admin Utama')
     expect(wrapper.find('.nk-usermenu__avatar').text()).toBe('A')
 

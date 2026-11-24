@@ -1,5 +1,6 @@
 import { API_BASE_PATH } from '@/constants/api'
-import type { MeResponse, MenuItem, TokenResponse } from '@/types/auth'
+import { SESSION_ROLES } from '@/constants/roles'
+import type { LoginResponse, MeResponse, MenuItem, TokenResponse } from '@/types/auth'
 import { MOCK_ACCESS_TOKEN, MOCK_REFRESH_TOKEN, fail, json, ok, type MockHandler } from './http'
 
 const AUTH = `${API_BASE_PATH}/auth`
@@ -45,23 +46,21 @@ export const APP_MENUS: MenuItem[] = [
   menu('app.settings', 'Pengaturan', '/app/pengaturan', 'settings', 90),
 ]
 
+// Bentuk mengikuti backend NestJS: tanpa envelope, camelCase, `role` berupa string.
 const ME: MeResponse = {
   id: MOCK_ME_ID,
   name: 'Admin Utama',
   email: MOCK_EMAIL,
-  role: { id: MOCK_SUPERADMIN_ROLE_ID, name: 'SuperAdmin' },
-  is_active: true,
-  created_at: '2026-01-01T00:00:00.000Z',
-  updated_at: '2026-01-01T00:00:00.000Z',
+  role: SESSION_ROLES.SUPERADMIN,
   permissions: MOCK_PERMISSIONS.map((p) => p.code),
   menus: ADMIN_MENUS,
 }
 
 const TOKENS: TokenResponse = {
-  access_token: MOCK_ACCESS_TOKEN,
-  refresh_token: MOCK_REFRESH_TOKEN,
-  token_type: 'Bearer',
-  expires_in: 900,
+  accessToken: MOCK_ACCESS_TOKEN,
+  refreshToken: MOCK_REFRESH_TOKEN,
+  tokenType: 'Bearer',
+  expiresIn: 900,
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -132,14 +131,19 @@ export const handleAuth: MockHandler = ({ url, method, headers, body }) => {
     if (!valid) {
       return fail(401, 'Unauthorized')
     }
-    return window.__nkMock === 'unverified' ? fail(403, 'Email not verified') : ok(TOKENS)
+    if (window.__nkMock === 'unverified') {
+      return fail(403, 'Email not verified')
+    }
+    const { id, email, name, role } = ME
+    const loggedIn: LoginResponse = { ...TOKENS, user: { id, email, name, role } }
+    return ok(loggedIn)
   }
   const activation = handleActivation(route, fields)
   if (activation) {
     return activation
   }
   if (route === 'POST /refresh') {
-    return fields.refresh_token === MOCK_REFRESH_TOKEN ? ok(TOKENS) : fail(401, 'Unauthorized')
+    return fields.refreshToken === MOCK_REFRESH_TOKEN ? ok(TOKENS) : fail(401, 'Unauthorized')
   }
   if (route === 'POST /logout') {
     return new Response(null, { status: 204 })

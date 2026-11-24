@@ -1,9 +1,10 @@
 import type {
   LoginRequest,
+  LoginResponse,
   MeResponse,
+  RefreshTokenRequest,
   RegisterRequest,
   ResendVerificationRequest,
-  TokenResponse,
   VerifyEmailRequest,
 } from '@/types/auth'
 import { apiRequest } from './http'
@@ -11,13 +12,11 @@ import { clearSession, getRefreshToken, setSession } from './token'
 
 export async function login(email: string, password: string): Promise<void> {
   const body: LoginRequest = { email, password }
-  const tokens = await apiRequest<TokenResponse>('/auth/login', {
-    method: 'POST',
-    body,
-    skipAuth: true,
-    skipRetry: true,
-  })
-  setSession(tokens)
+  const { accessToken, refreshToken, tokenType, expiresIn } = await apiRequest<LoginResponse>(
+    '/auth/login',
+    { method: 'POST', body, skipAuth: true, skipRetry: true },
+  )
+  setSession({ accessToken, refreshToken, tokenType, expiresIn })
 }
 
 // TODO(BE): register, verify-email, dan resend-verification belum ada di backend; bentuknya
@@ -57,9 +56,10 @@ export async function logout(): Promise<void> {
   const refreshToken = getRefreshToken()
   try {
     if (refreshToken) {
+      const body: RefreshTokenRequest = { refreshToken }
       await apiRequest<null>('/auth/logout', {
         method: 'POST',
-        body: { refresh_token: refreshToken },
+        body,
         notifySessionExpired: false,
       })
     }

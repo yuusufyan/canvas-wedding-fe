@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
 import { getTemplateDemo, listPublicTemplates } from '../publicTemplates'
 import { installMockApi } from '../mock'
 import { clearSession, setSession } from '../token'
+import { API_BASE_URL } from '@/constants/api'
 
 type FetchMock = Mock<typeof fetch>
 
@@ -24,7 +25,7 @@ describe('publicTemplates API', () => {
   beforeEach(() => {
     fetchMock = vi.fn<typeof fetch>()
     vi.stubGlobal('fetch', fetchMock)
-    setSession({ access_token: 'tok', refresh_token: 'ref', token_type: 'Bearer', expires_in: 60 })
+    setSession({ accessToken: 'tok', refreshToken: 'ref', tokenType: 'Bearer', expiresIn: 60 })
   })
 
   afterEach(() => {
@@ -40,7 +41,7 @@ describe('publicTemplates API', () => {
     expect(result.data).toHaveLength(1)
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
-    expect(url).toBe('/api/v1/public/templates?page=1&limit=4')
+    expect(url).toBe(`${API_BASE_URL}/public/templates?page=1&limit=4`)
     expect(init.headers).not.toHaveProperty('Authorization')
   })
 
@@ -48,7 +49,9 @@ describe('publicTemplates API', () => {
     fetchMock.mockResolvedValue(new Response('{}', { status: 404 }))
 
     await expect(getTemplateDemo('a b/c')).rejects.toMatchObject({ status: 404 })
-    expect((fetchMock.mock.calls[0] as [string])[0]).toBe('/api/v1/public/templates/a%20b%2Fc/demo')
+    expect((fetchMock.mock.calls[0] as [string])[0]).toBe(
+      `${API_BASE_URL}/public/templates/a%20b%2Fc/demo`,
+    )
   })
 })
 
@@ -76,24 +79,30 @@ describe('mock API', () => {
   }
 
   it('TC-UI-F2-41: melayani daftar dan demo, meneruskan path lain ke fetch asli', async () => {
-    const list = await call('/api/v1/public/templates?page=1&limit=2')
+    const list = await call(`${API_BASE_URL}/public/templates?page=1&limit=2`)
     expect((await list.json()).data).toHaveLength(2)
 
-    const demo = await call('/api/v1/public/templates/rustic-hijau/demo')
+    const demo = await call(`${API_BASE_URL}/public/templates/rustic-hijau/demo`)
     expect((await demo.json()).data.document.pages).toHaveLength(9)
 
-    await call('/api/v1/tidak-dikenal')
+    await call(`${API_BASE_URL}/tidak-dikenal`)
     expect(realFetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('mock tidak mencegat origin lain, walau path-nya sama dengan endpoint backend', async () => {
+    await call('https://other-origin.example/public/templates?page=1&limit=2')
+    await call('https://other-origin.example/auth/me')
+    expect(realFetch).toHaveBeenCalledTimes(2)
   })
 
   it('TC-UI-F2-42: mode empty, error, dan slug tidak dikenal', async () => {
     window.__nkMock = 'empty'
-    expect((await (await call('/api/v1/public/templates?limit=4')).json()).data).toEqual([])
+    expect((await (await call(`${API_BASE_URL}/public/templates?limit=4`)).json()).data).toEqual([])
 
     window.__nkMock = 'error'
-    expect((await call('/api/v1/public/templates')).status).toBe(500)
+    expect((await call(`${API_BASE_URL}/public/templates`)).status).toBe(500)
 
     delete window.__nkMock
-    expect((await call('/api/v1/public/templates/tidak-ada/demo')).status).toBe(404)
+    expect((await call(`${API_BASE_URL}/public/templates/tidak-ada/demo`)).status).toBe(404)
   })
 })

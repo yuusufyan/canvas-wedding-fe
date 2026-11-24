@@ -99,8 +99,7 @@ describe('AdminUsersView', () => {
         id: 'u-1',
         name: 'Admin Utama',
         email: 'admin@contoh.test',
-        role: SUPERADMIN,
-        is_active: true,
+        role: 'superadmin',
       },
     })
     vi.mocked(listUsers)

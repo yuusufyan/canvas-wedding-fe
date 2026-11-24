@@ -3,15 +3,11 @@ import { computed, ref } from 'vue'
 import { getMe, login as apiLogin, logout as apiLogout } from '@/api/auth'
 import { refreshAccessToken } from '@/api/http'
 import { clearSession, getRefreshToken } from '@/api/token'
-import type { MeResponse, MenuItem, RoleSummary } from '@/types/auth'
+import { SESSION_ROLES } from '@/constants/roles'
+import type { AuthUser, MeResponse, MenuItem } from '@/types/auth'
 
-export interface SessionProfile {
-  id: string
-  name: string
-  email: string
-  role: RoleSummary
-  is_active: boolean
-}
+// Identitas sesi persis seperti dikirim backend NestJS (`role` = nama role, huruf kecil).
+export type SessionProfile = AuthUser
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
@@ -21,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const menus = ref<MenuItem[]>([])
   const permissions = ref<string[]>([])
 
-  const isSuperAdmin = computed(() => profile.value?.role.name === 'SuperAdmin')
+  const isSuperAdmin = computed(() => profile.value?.role === SESSION_ROLES.SUPERADMIN)
 
   // Shared across concurrent bootstrap()/guard calls so the refresh+me
   // sequence only ever runs once per app load.
@@ -33,7 +29,6 @@ export const useAuthStore = defineStore('auth', () => {
       name: me.name,
       email: me.email,
       role: me.role,
-      is_active: me.is_active,
     }
     menus.value = me.menus ?? []
     permissions.value = me.permissions ?? []

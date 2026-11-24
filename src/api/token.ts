@@ -16,8 +16,8 @@ export function getRefreshToken(): string | null {
 }
 
 export function setSession(tokens: TokenResponse): void {
-  accessToken = tokens.access_token
-  sessionStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, tokens.refresh_token)
+  accessToken = tokens.accessToken
+  sessionStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, tokens.refreshToken)
 }
 
 export function clearSession(): void {

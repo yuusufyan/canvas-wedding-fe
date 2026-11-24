@@ -5,12 +5,13 @@ import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import LoginView from '../LoginView.vue'
 import { clearSession } from '@/api/token'
 import type { TokenResponse } from '@/types/auth'
+import { API_BASE_URL } from '@/constants/api'
 
 const tokens: TokenResponse = {
-  access_token: 'access-1', // secret-scan:ignore fake value
-  refresh_token: 'refresh-1', // secret-scan:ignore fake value
-  token_type: 'Bearer',
-  expires_in: 1800,
+  accessToken: 'access-1', // secret-scan:ignore fake value
+  refreshToken: 'refresh-1', // secret-scan:ignore fake value
+  tokenType: 'Bearer',
+  expiresIn: 1800,
 }
 
 type MockResponse = Pick<Response, 'ok' | 'status'> & { json: () => Promise<unknown> }
@@ -21,6 +22,11 @@ function jsonResponse(status: number, data: unknown): MockResponse {
     status,
     json: async () => ({ code: status, status: 'ok', message: '', data }),
   }
+}
+
+// Respons sukses backend NestJS: body apa adanya, tanpa envelope.
+function rawResponse(status: number, body: unknown): MockResponse {
+  return { ok: status >= 200 && status < 300, status, json: async () => body }
 }
 
 type FetchMock = (url: string, init?: RequestInit) => Promise<MockResponse>
@@ -96,13 +102,18 @@ describe('LoginView', () => {
   it('TC-UNIT-32: a second click while submitting is ignored, fetch runs once', async () => {
     let resolveLogin: ((value: MockResponse) => void) | undefined
     const fetchMock = vi.fn<FetchMock>((url) => {
-      if (url === '/api/v1/auth/login') {
+      if (url === `${API_BASE_URL}/auth/login`) {
         return new Promise((resolve) => {
           resolveLogin = resolve
         })
       }
       return Promise.resolve(
-        jsonResponse(200, { id: '1', name: 'SuperAdmin', role: { name: 'SuperAdmin' } }),
+        rawResponse(200, {
+          id: '1',
+          name: 'Admin',
+          email: 'admin@example.com',
+          role: 'superadmin',
+        }),
       )
     })
     vi.stubGlobal('fetch', fetchMock)
@@ -118,7 +129,12 @@ describe('LoginView', () => {
     expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBeDefined()
     expect(fetchMock).toHaveBeenCalledTimes(1)
 
-    resolveLogin?.(jsonResponse(200, tokens))
+    resolveLogin?.(
+      rawResponse(200, {
+        ...tokens,
+        user: { id: '1', name: 'Admin', email: 'admin@example.com', role: 'superadmin' },
+      }),
+    )
     await flushPromises()
   })
 
