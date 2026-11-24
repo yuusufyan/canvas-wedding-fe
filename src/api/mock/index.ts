@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from '@/constants/api'
+import { API_BASE_PATH, API_ORIGIN } from '@/constants/api'
 import { handleAccounts } from './accounts'
 import { handleAdmin } from './admin'
 import { handleAuth } from './auth'
@@ -62,7 +62,7 @@ export function installMockApi(): void {
       headers: new Headers(init?.headers),
       body: await parseBody(init),
     }
-    if (request.url.pathname.startsWith(API_BASE_PATH)) {
+    if (request.url.origin === API_ORIGIN && request.url.pathname.startsWith(API_BASE_PATH)) {
       if (window.__nkMock === 'network') {
         throw new TypeError('Failed to fetch')
       }
