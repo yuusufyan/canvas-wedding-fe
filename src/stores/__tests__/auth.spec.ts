@@ -18,6 +18,8 @@ const profile: MeResponse = {
   name: 'Super Admin',
   email: 'superadmin@example.com',
   role: 'superadmin',
+  permissions: [],
+  menus: [],
 }
 
 type MockResponse = Pick<Response, 'ok' | 'status'> & { json: () => Promise<unknown> }

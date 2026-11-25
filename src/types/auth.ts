@@ -64,9 +64,8 @@ export interface MenuItem {
   sortOrder: number
 }
 
-// Body respons GET /auth/me di backend NestJS (isi `data` pada envelope). `permissions` dan `menus`
-// belum dikirim backend NestJS (TODO(BE)); opsional sampai ada, sidebar memakai menu cadangan.
+// Body respons GET /auth/me di backend NestJS (isi `data` pada envelope).
 export interface MeResponse extends AuthUser {
-  permissions?: string[]
-  menus?: MenuItem[]
+  permissions: string[]
+  menus: MenuItem[]
 }

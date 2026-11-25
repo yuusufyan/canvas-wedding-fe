@@ -1,5 +1,4 @@
 import { API_BASE_PATH, API_ORIGIN } from '@/constants/api'
-import { handleAccounts } from './accounts'
 import { handleAdmin } from './admin'
 import { handleAuth } from './auth'
 import { handleDashboard } from './dashboard'
@@ -32,13 +31,7 @@ const handlePublicTemplates: MockHandler = ({ url }) => {
   return ok(demo)
 }
 
-const HANDLERS: MockHandler[] = [
-  handleAuth,
-  handleAccounts,
-  handleDashboard,
-  handleAdmin,
-  handlePublicTemplates,
-]
+const HANDLERS: MockHandler[] = [handleAuth, handleDashboard, handleAdmin, handlePublicTemplates]
 
 async function parseBody(init?: RequestInit): Promise<unknown> {
   if (typeof init?.body !== 'string') {

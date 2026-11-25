@@ -84,12 +84,13 @@ describe('API izin, menu, dan dashboard', () => {
 
 const AUTH = { Authorization: 'Bearer mock-access-token' }
 
-describe('mock pengguna, role, izin, dan menu', () => {
+describe('mock dashboard & penerusan endpoint RBAC ke BE nyata', () => {
+  let realFetch: Mock<typeof fetch>
+
   beforeEach(() => {
     vi.useFakeTimers()
-    window.fetch = vi
-      .fn<typeof fetch>()
-      .mockResolvedValue(new Response('{}')) as unknown as typeof window.fetch
+    realFetch = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
+    window.fetch = realFetch as unknown as typeof window.fetch
     installMockApi()
   })
 
@@ -108,124 +109,6 @@ describe('mock pengguna, role, izin, dan menu', () => {
     return pending
   }
   const json = async (res: Response) => (await res.json()).data
-  const ME = '00000000-0000-4000-8000-000000000001'
-  const SUPERADMIN = '00000000-0000-4000-8000-0000000000a1'
-  const USER = '00000000-0000-4000-8000-0000000000a2'
-  const OPERATOR = '00000000-0000-4000-8000-0000000000a3'
-
-  it('TC-UI-F5-10: daftar pengguna berpaginasi dengan email penuh, tanpa field sensitif', async () => {
-    const res = await call(`${API_BASE_URL}/users?page=2&limit=5`)
-    const body = await res.json()
-
-    expect(body.meta).toMatchObject({ page: 2, limit: 5, total: 12 })
-    expect(body.data).toHaveLength(5)
-    expect(JSON.stringify(body.data)).not.toContain('password')
-    expect((await json(await call(`${API_BASE_URL}/users/${ME}`))).email).toBe('admin@contoh.test')
-    expect((await call(`${API_BASE_URL}/users/bukan-uuid`)).status).toBe(400)
-    expect((await call(`${API_BASE_URL}/users/00000000-0000-4000-8000-0000000000ff`)).status).toBe(
-      404,
-    )
-  })
-
-  it('TC-UI-F5-11: buat pengguna memvalidasi, menolak email kembar dan role tak dikenal', async () => {
-    const valid = {
-      name: 'Baru',
-      email: 'Baru@contoh.test',
-      password: 'Niskala2026!',
-      roleId: USER,
-    }
-
-    expect(
-      (await call(`${API_BASE_URL}/users`, 'POST', { ...valid, password: 'pendek' })).status,
-    ).toBe(400)
-    expect((await call(`${API_BASE_URL}/users`, 'POST', { ...valid, roleId: 'x' })).status).toBe(
-      400,
-    )
-    expect(
-      (await call(`${API_BASE_URL}/users`, 'POST', { ...valid, email: 'admin@contoh.test' }))
-        .status,
-    ).toBe(409)
-    const created = await call(`${API_BASE_URL}/users`, 'POST', valid)
-    expect(created.status).toBe(201)
-    expect((await json(created)).email).toBe('baru@contoh.test')
-    expect((await json(await call(`${API_BASE_URL}/users`))).length).toBe(10)
-  })
-
-  it('TC-UI-F5-12: ubah pengguna: akun sendiri dan SuperAdmin aktif terakhir tidak bisa diturunkan atau dinonaktifkan (409)', async () => {
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { isActive: false })).status).toBe(
-      409,
-    )
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { roleId: USER })).status).toBe(409)
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { name: 'Nama Baru' })).status).toBe(
-      200,
-    )
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', {})).status).toBe(400)
-    expect(
-      (await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { email: 'rina@contoh.test' })).status,
-    ).toBe(409)
-    expect(
-      (
-        await call(`${API_BASE_URL}/users/00000000-0000-4000-8000-000000000004`, 'PATCH', {
-          isActive: false,
-        })
-      ).status,
-    ).toBe(200)
-  })
-
-  it('TC-UI-F5-13: hapus pengguna: akun sendiri 409, lainnya 204 lalu 404', async () => {
-    expect((await call(`${API_BASE_URL}/users/${ME}`, 'DELETE')).status).toBe(409)
-    const other = '00000000-0000-4000-8000-000000000012'
-    expect((await call(`${API_BASE_URL}/users/${other}`, 'DELETE')).status).toBe(204)
-    expect((await call(`${API_BASE_URL}/users/${other}`)).status).toBe(404)
-  })
-
-  it('TC-UI-F5-14: role sistem 403 pada PATCH/DELETE; role kustom dipakai 409; role baru bisa diubah dan dihapus', async () => {
-    expect(
-      (await call(`${API_BASE_URL}/roles/${SUPERADMIN}`, 'PATCH', { name: 'Lain' })).status,
-    ).toBe(403)
-    expect(
-      (await call(`${API_BASE_URL}/roles/${USER}`, 'PATCH', { description: 'x' })).status,
-    ).toBe(403)
-    expect((await call(`${API_BASE_URL}/roles/${USER}`, 'DELETE')).status).toBe(403)
-    expect((await call(`${API_BASE_URL}/roles/${OPERATOR}`, 'DELETE')).status).toBe(409)
-
-    expect((await call(`${API_BASE_URL}/roles`, 'POST', { name: 'ab' })).status).toBe(400)
-    expect((await call(`${API_BASE_URL}/roles`, 'POST', { name: 'operator' })).status).toBe(409)
-    const created = await json(
-      await call(`${API_BASE_URL}/roles`, 'POST', { name: 'Tamu Khusus', description: 'uji' }),
-    )
-    expect(
-      (
-        await json(
-          await call(`${API_BASE_URL}/roles/${created.id}`, 'PATCH', { name: 'Tamu Baru' }),
-        )
-      ).name,
-    ).toBe('Tamu Baru')
-    expect((await call(`${API_BASE_URL}/roles/${created.id}`, 'DELETE')).status).toBe(204)
-  })
-
-  it('TC-UI-F5-15: katalog dan set izin/menu: PUT mengganti seluruh set; SuperAdmin 403; kode tak dikenal 400', async () => {
-    expect((await json(await call(`${API_BASE_URL}/permissions?limit=100`))).length).toBe(11)
-    expect((await json(await call(`${API_BASE_URL}/menus?limit=100`))).length).toBe(13)
-    expect(
-      (await json(await call(`${API_BASE_URL}/roles/${SUPERADMIN}/permissions`))).permissions,
-    ).toEqual([])
-
-    const put = (kind: string, body: unknown, id = USER) =>
-      call(`${API_BASE_URL}/roles/${id}/${kind}`, 'PUT', body)
-    const saved = await json(await put('permissions', { permissions: ['templates.read'] }))
-    expect(saved.permissions).toEqual(['templates.read'])
-    expect(
-      (await json(await call(`${API_BASE_URL}/roles/${USER}/permissions`))).permissions,
-    ).toEqual(['templates.read'])
-    expect(
-      (await put('permissions', { permissions: ['templates.read', 'templates.read'] })).status,
-    ).toBe(400)
-    expect((await put('permissions', { permissions: ['tidak.ada'] })).status).toBe(400)
-    expect((await put('menus', { menus: ['tidak.ada'] })).status).toBe(400)
-    expect((await put('menus', { menus: ['app.home'] })).status).toBe(200)
-    expect((await put('permissions', { permissions: [] }, SUPERADMIN)).status).toBe(403)
-  })
 
   it('TC-UI-F5-16: dashboard mock butuh token, mode empty mengosongkan data', async () => {
     const unauthenticated = window.fetch(`${API_BASE_URL}/dashboard/activity`)
@@ -241,61 +124,12 @@ describe('mock pengguna, role, izin, dan menu', () => {
 
     window.__nkMock = 'empty'
     expect(await json(await call(`${API_BASE_URL}/dashboard/activity`))).toEqual([])
-    expect(await json(await call(`${API_BASE_URL}/users`))).toEqual([])
-    window.__nkMock = 'forbidden'
-    expect((await call(`${API_BASE_URL}/roles`)).status).toBe(403)
-  })
-})
-
-describe('mock menyerupai pesan dan data backend', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-    window.fetch = vi
-      .fn<typeof fetch>()
-      .mockResolvedValue(new Response('{}')) as unknown as typeof window.fetch
-    installMockApi()
   })
 
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
-  async function call(path: string, method = 'GET', body?: unknown) {
-    const pending = window.fetch(path, {
-      method,
-      headers: AUTH,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    })
-    await vi.advanceTimersByTimeAsync(5000)
-    return pending
-  }
-  const message = async (res: Response) => (await res.json()).message
-  const ME = '00000000-0000-4000-8000-000000000001'
-  const SUPERADMIN = '00000000-0000-4000-8000-0000000000a1'
-  const USER = '00000000-0000-4000-8000-0000000000a2'
-
-  it('TC-UI-F5-67: pesan 409 dan 403 sama dengan backend', async () => {
-    expect(await message(await call(`${API_BASE_URL}/users/${ME}`, 'DELETE'))).toBe(
-      'You cannot deactivate, demote, or delete yourself',
-    )
-    expect(await message(await call(`${API_BASE_URL}/roles/${SUPERADMIN}`, 'DELETE'))).toBe(
-      'Role SuperAdmin cannot be modified or deleted',
-    )
-    expect(
-      await message(await call(`${API_BASE_URL}/roles/${USER}`, 'PATCH', { name: 'Lain' })),
-    ).toBe('Role User cannot be modified or deleted')
-    expect(
-      await message(
-        await call(`${API_BASE_URL}/users/${ME}`, 'PATCH', { email: 'rina@contoh.test' }),
-      ),
-    ).toBe('Email already registered')
-  })
-
-  it('TC-UI-F5-68: /auth/me SuperAdmin berisi seluruh katalog izin', async () => {
-    const me = (await (await call(`${API_BASE_URL}/auth/me`)).json()).data
-    const catalog = (await (await call(`${API_BASE_URL}/permissions?limit=100`)).json()).data
-
-    expect(me.permissions).toHaveLength(11)
-    expect(me.permissions).toEqual(catalog.map((p: { code: string }) => p.code))
+  it('endpoint RBAC dan auth utama diteruskan langsung ke backend tanpa dicegat mock', async () => {
+    for (const path of ['/auth/me', '/users', '/roles', '/permissions', '/menus']) {
+      await call(`${API_BASE_URL}${path}`)
+    }
+    expect(realFetch).toHaveBeenCalledTimes(5)
   })
 })

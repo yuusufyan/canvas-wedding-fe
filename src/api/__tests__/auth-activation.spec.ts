@@ -130,33 +130,5 @@ describe('mock registrasi dan aktivasi', () => {
       (await post(`${API_BASE_URL}/auth/resend-verification`, { email: 'a@contoh.test' })).status,
     ).toBe(429)
     expect((await post(`${API_BASE_URL}/auth/register`, valid)).status).toBe(429)
-    expect(
-      (await post(`${API_BASE_URL}/auth/login`, { email: 'admin@contoh.test', password: 'x' }))
-        .status,
-    ).toBe(429)
-  })
-
-  it('TC-UI-F4-18: login: mode unverified menjawab 403 hanya untuk kredensial benar; mode network gagal', async () => {
-    window.__nkMock = 'unverified'
-    const ok = { email: 'admin@contoh.test', password: 'apa-saja' } // secret-scan:ignore nilai palsu untuk test
-    expect((await post(`${API_BASE_URL}/auth/login`, ok)).status).toBe(403)
-    expect(
-      (await post(`${API_BASE_URL}/auth/login`, { ...ok, email: 'lain@contoh.test' })).status,
-    ).toBe(401)
-
-    window.__nkMock = 'network'
-    await expect(
-      window.fetch(`${API_BASE_URL}/auth/login`, { method: 'POST', body: JSON.stringify(ok) }),
-    ).rejects.toBeInstanceOf(TypeError)
-  })
-
-  it('TC-UI-F4-19: mode rate-limit tidak mengganggu refresh dan me', async () => {
-    window.__nkMock = 'rate-limit'
-
-    const refresh = await post(`${API_BASE_URL}/auth/refresh`, {
-      refreshToken: 'mock-refresh-token',
-    })
-
-    expect(refresh.status).toBe(200)
   })
 })

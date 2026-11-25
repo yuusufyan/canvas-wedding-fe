@@ -105,19 +105,16 @@ describe('AppShellLayout', () => {
     wrapper.unmount()
   })
 
-  it('TC-UI-F3-42: menus kosong memakai menu cadangan sesuai peran', async () => {
+  it('TC-UI-F3-42: menus kosong merender daftar menu kosong tanpa menu cadangan', async () => {
     signIn('SuperAdmin', [])
     const admin = await mountShell(createTestRouter())
-    expect(admin.findAll('.nk-sidebar__nav a').map((a) => a.text())).toEqual([
-      'Dashboard',
-      'Pengguna & Role',
-    ])
+    expect(admin.findAll('.nk-sidebar__nav a')).toHaveLength(0)
     admin.unmount()
 
     setActivePinia(createPinia())
     signIn('User', [])
     const user = await mountShell(createTestRouter())
-    expect(user.findAll('.nk-sidebar__nav a').map((a) => a.text())).toEqual(['Beranda'])
+    expect(user.findAll('.nk-sidebar__nav a')).toHaveLength(0)
     user.unmount()
   })
 
