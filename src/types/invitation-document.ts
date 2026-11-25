@@ -24,6 +24,8 @@ export interface TextElement extends ElementBase {
   color: string
   align: 'left' | 'center' | 'right'
   weight?: number
+  italic?: boolean
+  line_height?: number
   letter_spacing?: number
   uppercase?: boolean
 }
@@ -32,6 +34,8 @@ export interface ShapeElement extends ElementBase {
   type: 'shape'
   shape: 'rect' | 'arch' | 'line'
   fill: string
+  radius?: number
+  border?: string
 }
 
 export interface CountdownElement extends ElementBase {
@@ -45,6 +49,7 @@ export interface ButtonElement extends ElementBase {
   label: string
   fill: string
   color: string
+  radius?: number
 }
 
 export type InvitationElement = TextElement | ShapeElement | CountdownElement | ButtonElement

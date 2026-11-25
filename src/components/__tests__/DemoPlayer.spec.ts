@@ -61,8 +61,8 @@ describe('DemoPlayer', () => {
     const range = wrapper.find('input[type="range"]')
 
     await range.setValue('20')
-    expect(wrapper.text()).toContain('00:20 / 00:45')
-    expect(range.attributes('aria-valuetext')).toContain('dari 9')
+    expect(wrapper.text()).toContain('00:20 / 00:40')
+    expect(range.attributes('aria-valuetext')).toContain('dari 8')
 
     const toggle = wrapper.find('[role="switch"]')
     expect(toggle.attributes('aria-checked')).toBe('true')

@@ -52,17 +52,30 @@ function style(el: InvitationElement, index: number): CSSProperties {
         fontSize: cqw(el.size),
         textAlign: el.align,
         fontWeight: el.weight,
+        fontStyle: el.italic ? 'italic' : undefined,
+        lineHeight: el.line_height !== undefined ? String(el.line_height) : undefined,
         letterSpacing: el.letter_spacing !== undefined ? `${el.letter_spacing}em` : undefined,
         textTransform: el.uppercase ? 'uppercase' : undefined,
       }
     case 'shape': {
       const fill = safeColor(el.fill, 'transparent')
+      const border = el.border ? `1px solid ${safeColor(el.border, 'transparent')}` : undefined
       if (el.shape === 'arch') {
         const top = cqw(el.width / 2)
         const bottom = `${ARCH_BOTTOM_RADIUS}cqw`
-        return { ...base, background: fill, borderRadius: `${top} ${top} ${bottom} ${bottom}` }
+        return {
+          ...base,
+          background: fill,
+          border,
+          borderRadius: `${top} ${top} ${bottom} ${bottom}`,
+        }
       }
-      return { ...base, background: fill }
+      return {
+        ...base,
+        background: fill,
+        border,
+        borderRadius: el.radius !== undefined ? cqw(el.radius) : undefined,
+      }
     }
     case 'countdown':
       return { ...base, color: safeColor(el.color, '#000') }
@@ -71,6 +84,7 @@ function style(el: InvitationElement, index: number): CSSProperties {
         ...base,
         background: safeColor(el.fill, 'transparent'),
         color: safeColor(el.color, '#000'),
+        borderRadius: el.radius !== undefined ? cqw(el.radius) : undefined,
       }
   }
 }
