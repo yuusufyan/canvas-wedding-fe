@@ -20,6 +20,8 @@ function me(role: string): MeResponse {
     name: 'Pengguna',
     email: 'pengguna@contoh.test',
     role,
+    permissions: [],
+    menus: [],
   }
 }
 

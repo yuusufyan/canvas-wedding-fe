@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const profile = ref<SessionProfile | null>(null)
   const sessionExpiredNotice = ref(false)
-  // Dari GET /auth/me; kosong bila backend belum mengirimnya (sidebar memakai menu cadangan).
+  // Dari GET /auth/me.
   const menus = ref<MenuItem[]>([])
   const permissions = ref<string[]>([])
 
@@ -34,8 +34,8 @@ export const useAuthStore = defineStore('auth', () => {
       email: me.email,
       role: me.role,
     }
-    menus.value = me.menus ?? []
-    permissions.value = me.permissions ?? []
+    menus.value = me.menus
+    permissions.value = me.permissions
     isAuthenticated.value = true
   }
 

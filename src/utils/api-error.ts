@@ -1,19 +1,28 @@
 import { ApiError } from '@/api/http'
 
-// Pesan BE yang dipakai untuk membedakan arti sebuah 409/403 (tidak pernah ditampilkan mentah).
-const BE_EMAIL_TAKEN = 'Email already registered'
-const BE_SELF_PROTECTED = 'You cannot deactivate, demote, or delete yourself'
-const BE_LAST_SUPERADMIN = 'At least one active SuperAdmin must remain'
-const BE_ROLE_NAME_TAKEN = 'Role name already exists'
-const BE_ROLE_IN_USE = 'Role is still used by users'
+// Pesan BE yang dipakai untuk membedakan arti sebuah 409 (tidak pernah ditampilkan mentah).
+const EMAIL_TAKEN_TEXT = 'Email sudah terdaftar. Gunakan email lain.'
+const SELF_PROTECTED_TEXT =
+  'Tindakan ditolak: akunmu sendiri tidak bisa dinonaktifkan, diturunkan rolenya, atau dihapus.'
+const LAST_SUPERADMIN_TEXT = 'Tindakan ditolak: harus tersisa minimal satu SuperAdmin aktif.'
+const ROLE_NAME_TAKEN_TEXT = 'Nama role sudah dipakai. Gunakan nama lain.'
+const ROLE_IN_USE_TEXT = 'Role masih dipakai pengguna.'
 
 const CONFLICT_TEXT: Record<string, string> = {
-  [BE_EMAIL_TAKEN]: 'Email sudah terdaftar. Gunakan email lain.',
-  [BE_SELF_PROTECTED]:
-    'Tindakan ditolak: akunmu sendiri tidak bisa dinonaktifkan, diturunkan rolenya, atau dihapus.',
-  [BE_LAST_SUPERADMIN]: 'Tindakan ditolak: harus tersisa minimal satu SuperAdmin aktif.',
-  [BE_ROLE_NAME_TAKEN]: 'Nama role sudah dipakai. Gunakan nama lain.',
-  [BE_ROLE_IN_USE]: 'Role masih dipakai pengguna.',
+  // Pesan backend NestJS
+  'Email sudah terdaftar': EMAIL_TAKEN_TEXT,
+  'Tidak dapat menonaktifkan akun sendiri': SELF_PROTECTED_TEXT,
+  'Tidak dapat menghapus akun sendiri': SELF_PROTECTED_TEXT,
+  'Superadmin aktif terakhir tidak dapat dinonaktifkan atau dipindah role': LAST_SUPERADMIN_TEXT,
+  'Superadmin aktif terakhir tidak dapat dihapus': LAST_SUPERADMIN_TEXT,
+  'Nama role sudah digunakan': ROLE_NAME_TAKEN_TEXT,
+  'Role masih digunakan oleh pengguna': ROLE_IN_USE_TEXT,
+  // Kompatibilitas pesan lama
+  'Email already registered': EMAIL_TAKEN_TEXT,
+  'You cannot deactivate, demote, or delete yourself': SELF_PROTECTED_TEXT,
+  'At least one active SuperAdmin must remain': LAST_SUPERADMIN_TEXT,
+  'Role name already exists': ROLE_NAME_TAKEN_TEXT,
+  'Role is still used by users': ROLE_IN_USE_TEXT,
 }
 
 // Pesan generik berbahasa Indonesia untuk kegagalan aksi; detail teknis tidak ditampilkan.

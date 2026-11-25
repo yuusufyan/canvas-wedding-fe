@@ -5,9 +5,11 @@ import { API_BASE_URL } from '@/constants/api'
 const AUTH = { Authorization: 'Bearer mock-access-token' }
 
 describe('mock API admin dan auth', () => {
+  let realFetch: ReturnType<typeof vi.fn<typeof fetch>>
+
   beforeEach(() => {
     vi.useFakeTimers()
-    const realFetch = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
+    realFetch = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
     window.fetch = realFetch as unknown as typeof window.fetch
     installMockApi()
   })
@@ -28,39 +30,12 @@ describe('mock API admin dan auth', () => {
 
   const get = (path: string) => call(path, { headers: AUTH })
 
-  it('TC-UI-F3-11: login, refresh, me, dan logout tiruan mengembalikan menu SuperAdmin', async () => {
-    const wrong = await post(`${API_BASE_URL}/auth/login`, {
-      email: 'x@contoh.test',
-      password: 'abc',
-    })
-    expect(wrong.status).toBe(401)
-    const login = await post(`${API_BASE_URL}/auth/login`, {
-      email: 'admin@contoh.test',
-      password: 'abc',
-    })
-    const loggedIn = (await login.json()).data
-    expect(loggedIn.accessToken).toBe('mock-access-token')
-    expect(loggedIn.user.role).toBe('superadmin')
-
-    expect((await post(`${API_BASE_URL}/auth/refresh`, { refreshToken: 'salah' })).status).toBe(401)
-    const refresh = await post(`${API_BASE_URL}/auth/refresh`, {
-      refreshToken: 'mock-refresh-token',
-    })
-    expect(refresh.status).toBe(200)
-
-    expect((await call(`${API_BASE_URL}/auth/me`)).status).toBe(401)
-    const me = (await (await get(`${API_BASE_URL}/auth/me`)).json()).data
-    expect(me.role).toBe('superadmin')
-    expect(me.menus.map((m: { label: string }) => m.label)).toEqual([
-      'Dashboard',
-      'Template',
-      'Undangan',
-      'Tamu',
-      'Pengguna & Role',
-      'Membership',
-      'Pengaturan',
-    ])
-    expect((await post(`${API_BASE_URL}/auth/logout`, {})).status).toBe(204)
+  it('TC-UI-F3-11: login, refresh, me, dan logout diteruskan ke backend nyata (tidak di-mock)', async () => {
+    await post(`${API_BASE_URL}/auth/login`, { email: 'admin@contoh.test', password: 'abc' })
+    await post(`${API_BASE_URL}/auth/refresh`, { refreshToken: 'tok' })
+    await get(`${API_BASE_URL}/auth/me`)
+    await post(`${API_BASE_URL}/auth/logout`, { refreshToken: 'tok' })
+    expect(realFetch).toHaveBeenCalledTimes(4)
   })
 
   it('TC-UI-F3-12: endpoint admin butuh token; mode forbidden, error, dan empty berlaku', async () => {

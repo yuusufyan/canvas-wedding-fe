@@ -17,24 +17,6 @@ const loggingOut = ref(false)
 const toggleButton = ref<HTMLButtonElement | null>(null)
 const sidebar = ref<HTMLElement | null>(null)
 
-// Menu cadangan saat /auth/me belum mengirim menus[] (backend lama): hanya rute yang ada.
-function fallbackMenu(
-  key: string,
-  label: string,
-  path: string,
-  icon: string,
-  order: number,
-): MenuItem {
-  return { key, label, path, icon, parentKey: null, sortOrder: order }
-}
-const FALLBACK_ADMIN_MENUS: MenuItem[] = [
-  fallbackMenu('fallback.home', 'Dashboard', '/admin', 'grid', 10),
-  fallbackMenu('fallback.users', 'Pengguna & Role', '/admin/pengguna', 'user-cog', 50),
-]
-const FALLBACK_USER_MENUS: MenuItem[] = [
-  fallbackMenu('fallback.app', 'Beranda', '/app', 'home', 10),
-]
-
 interface MenuNode {
   item: MenuItem
   children: MenuItem[]
@@ -45,12 +27,7 @@ function bySort(a: MenuItem, b: MenuItem): number {
 }
 
 const menuTree = computed<MenuNode[]>(() => {
-  const source =
-    authStore.menus.length > 0
-      ? authStore.menus
-      : authStore.isSuperAdmin
-        ? FALLBACK_ADMIN_MENUS
-        : FALLBACK_USER_MENUS
+  const source = authStore.menus
   const parents = source.filter((m) => !m.parentKey).sort(bySort)
   return parents.map((item) => ({
     item,
