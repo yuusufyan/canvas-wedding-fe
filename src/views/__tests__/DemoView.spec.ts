@@ -45,7 +45,7 @@ describe('DemoView', () => {
 
     expect(getTemplateDemo).toHaveBeenCalledWith('rustic-hijau')
     expect(wrapper.find('h1').text()).toContain('Hilbert & Hilda')
-    expect(wrapper.findAll('.nk-sections button')).toHaveLength(9)
+    expect(wrapper.findAll('.nk-sections button')).toHaveLength(8)
     expect(wrapper.text()).toContain('Animasi: Naik')
     expect(wrapper.find('a[href^="/login"]').text()).toContain('Pakai template ini')
     wrapper.unmount()

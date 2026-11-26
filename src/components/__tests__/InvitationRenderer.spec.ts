@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import InvitationRenderer from '../InvitationRenderer.vue'
+import { rusticDemoPages } from '@/api/mock/rustic-template'
 import type { InvitationPage } from '@/types/invitation-document'
 
 const page: InvitationPage = {
@@ -116,6 +117,89 @@ describe('InvitationRenderer', () => {
     expect(wrapper.find('.nk-el--text').attributes('style')).not.toContain('url(x)')
     expect(wrapper.find('img').exists()).toBe(false)
     expect(wrapper.find('.nk-el--text').text()).toBe('<img src=x onerror=alert(1)>')
+    wrapper.unmount()
+  })
+
+  it('TC-UI-F2-34b: merender italic, line-height, radius, dan border aman serta 8 bagian Rustic', () => {
+    const pages = rusticDemoPages()
+    expect(pages.map((p) => p.title)).toEqual([
+      'Cover',
+      'Ayat',
+      'Mempelai',
+      'Acara & Countdown',
+      'Galeri',
+      'Konfirmasi Kehadiran',
+      'Wedding Gift',
+      'Penutup',
+    ])
+
+    const styled: InvitationPage = {
+      id: 'styled',
+      title: 'Styled',
+      background: '#F7F2EA',
+      elements: [
+        {
+          id: 'q',
+          type: 'text',
+          text: 'QS. Ar-Rum : 21',
+          x: 20,
+          y: 20,
+          width: 200,
+          height: 30,
+          font: 'serif',
+          size: 14,
+          color: '#2E2A25',
+          align: 'center',
+          italic: true,
+          line_height: 1.6,
+        },
+        {
+          id: 'card',
+          type: 'shape',
+          shape: 'rect',
+          fill: '#7D5C34',
+          border: '#E9D8B4',
+          radius: 12,
+          x: 24,
+          y: 80,
+          width: 312,
+          height: 120,
+        },
+        {
+          id: 'unsafe-border',
+          type: 'shape',
+          shape: 'arch',
+          fill: '#FFFDF8',
+          border: 'red;background:url(x)',
+          x: 36,
+          y: 220,
+          width: 288,
+          height: 160,
+        },
+        {
+          id: 'btn',
+          type: 'button',
+          label: 'Kirim Ucapan',
+          fill: '#7D5C34',
+          color: '#FFFDF8',
+          radius: 6,
+          x: 24,
+          y: 400,
+          width: 312,
+          height: 38,
+        },
+      ],
+    }
+    const wrapper = mount(InvitationRenderer, { props: { page: styled } })
+    const textStyle = wrapper.find('.nk-el--text').attributes('style') ?? ''
+    expect(textStyle).toContain('font-style: italic')
+    expect(textStyle).toContain('line-height: 1.6')
+
+    const shapes = wrapper.findAll('div.nk-el')
+    expect(shapes[0]?.attributes('style')).toContain('border-radius')
+    expect(shapes[0]?.attributes('style')).toContain('border: 1px solid')
+    expect(shapes[1]?.attributes('style')).not.toContain('url(x)')
+    expect(wrapper.find('.nk-el--button').attributes('style')).toContain('border-radius')
     wrapper.unmount()
   })
 })

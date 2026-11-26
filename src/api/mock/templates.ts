@@ -5,6 +5,7 @@ import type {
   TextFont,
 } from '@/types/invitation-document'
 import type { PublicTemplateSummary, TemplateDemo } from '@/types/template'
+import { rusticCoverPage, rusticDemoPages } from './rustic-template'
 
 // Data contoh (fiktif) untuk pengembangan sebelum endpoint publik backend tersedia.
 interface Theme {
@@ -301,6 +302,9 @@ export const MOCK_THEME_SLUGS = THEMES.map((theme) => theme.slug)
 
 // Cover tanpa tombol untuk thumbnail; tema dipilih lewat slug (default: tema pertama).
 export function mockCover(slug: string): InvitationPage {
+  if (slug === 'rustic-hijau') {
+    return rusticCoverPage(false)
+  }
   const theme = THEMES.find((item) => item.slug === slug) ?? THEMES[0]!
   return coverPage(theme, false)
 }
@@ -315,7 +319,7 @@ export function mockTemplateSummaries(limit: number): PublicTemplateSummary[] {
     slug: theme.slug,
     name: theme.name,
     access: theme.access,
-    cover: coverPage(theme, false),
+    cover: theme.slug === 'rustic-hijau' ? rusticCoverPage(false) : coverPage(theme, false),
   }))
 }
 
@@ -324,17 +328,20 @@ export function mockTemplateDemo(slug: string): TemplateDemo | null {
   if (!theme) {
     return null
   }
+  const isRustic = theme.slug === 'rustic-hijau'
+  const pages = isRustic ? rusticDemoPages() : demoPages(theme)
   return {
     slug: theme.slug,
     name: theme.name,
     couple_label: 'Hilbert & Hilda',
     access: theme.access,
-    description:
-      '9 halaman dengan countdown, galeri, RSVP, dan amplop digital. Semua teks, warna, dan foto bisa kamu ubah.',
-    duration_seconds: 45,
+    description: isRustic
+      ? '8 bagian lengkap: cover, ayat, mempelai, rangkaian acara & countdown, galeri, RSVP, wedding gift, dan penutup.'
+      : '9 halaman dengan countdown, galeri, RSVP, dan amplop digital. Semua teks, warna, dan foto bisa kamu ubah.',
+    duration_seconds: isRustic ? 40 : 45,
     animation_label: 'Naik · 0,8 dtk',
     has_music: true,
     has_rsvp: true,
-    document: { schema_version: 1, pages: demoPages(theme) },
+    document: { schema_version: 1, pages },
   }
 }
