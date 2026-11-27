@@ -20,7 +20,17 @@ export function getTopTemplates(): Promise<TopTemplate[]> {
   return apiRequest<TopTemplate[]>('/dashboard/top-templates', { method: 'GET' })
 }
 
-// TODO(BE): audit_trails sudah ada di database tetapi belum punya endpoint baca.
-export function getRecentActivity(): Promise<ActivityEvent[]> {
-  return apiRequest<ActivityEvent[]>('/dashboard/activity', { method: 'GET' })
+type RawActivityEvent = Omit<ActivityEvent, 'occurred_at'> & {
+  occurredAt?: string
+  occurred_at?: string
+}
+
+export async function getRecentActivity(): Promise<ActivityEvent[]> {
+  const rows = await apiRequest<RawActivityEvent[]>('/dashboard/activity', { method: 'GET' })
+  return rows.map((row) => ({
+    id: row.id,
+    kind: row.kind,
+    message: row.message,
+    occurred_at: row.occurred_at ?? row.occurredAt ?? '',
+  }))
 }
